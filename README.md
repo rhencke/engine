@@ -1,4 +1,4 @@
-when [![pub package](http://img.shields.io/pub/v/when.svg)](https://pub.dartlang.org/packages/when) [![Build Status](https://drone.io/github.com/seaneagan/when/status.png)](https://drone.io/github.com/seaneagan/when/latest)
+when [![pub package](http://img.shields.io/pub/v/when.svg)](https://pub.dartlang.org/packages/when) [![Build Status](https://drone.io/github.com/seaneagan/when/status.png)](https://drone.io/github.com/seaneagan/when/latest) [![Coverage Status](https://img.shields.io/coveralls/seaneagan/when.svg)](https://coveralls.io/r/seaneagan/when?branch=master)
 ====
 
 It's often useful to provide sync (convenient) and async (concurrent) versions 
