@@ -40,8 +40,8 @@ _readJsonFile(String path, onAbsent(), exists(File file), read(File file)) {
   var file = new File(path);
   return when(
       () => exists(file),
-      (doesExist) => doesExist ?
-          when(() => read(file), JSON.decode) :
+      onSuccess: (doesExist) => doesExist ?
+          when(() => read(file), onSuccess: JSON.decode) :
           onAbsent());
 }
 
@@ -52,7 +52,6 @@ main() {
     print('Async json: $asyncJson');
   });
 }
-
 ```
 
 [Process.run]: https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart:io.Process#id_run

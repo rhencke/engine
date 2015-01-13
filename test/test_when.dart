@@ -15,7 +15,7 @@ main() {
       var onCompleteCalled = false;
       var ret = when(
           () => 5,
-          (x) {
+          onSuccess: (x) {
             expect(x, 5);
             onSuccessCalled = true;
             return 10;
@@ -36,7 +36,7 @@ main() {
       var onCompleteCalled = false;
       var ret = when(
           () => throw 'e',
-          (_) => onSuccessCalled = true,
+          onSuccess: (_) => onSuccessCalled = true,
           onError: (e) {
             expect(e, 'e');
             onErrorCalled = true;
@@ -54,7 +54,6 @@ main() {
       var onErrorCalled = false;
       when(
           () => throw 'e',
-          (_) {},
           onError: (e, s) {
             onErrorCalled = true;
             expect(s, isNotNull);
@@ -65,19 +64,21 @@ main() {
     test('should throw callback error if no onError provided', () {
       try {
         when(
-            () => throw 'e',
-            (_) {});
+            () => throw 'e');
         fail('callback error was swallowed');
       } catch (e) {
         expect(e, 'e');
       }
     });
 
+    test('should just return callback result if onSuccess not provided', () {
+        expect(when(() => 5), 5);
+    });
+
     test('should not swallow onComplete error', () {
       try {
         when(
             () {},
-            (_) {},
             onComplete: () => throw 'e');
         fail('onComplete error was swallowed');
       } catch (e) {
@@ -93,7 +94,7 @@ main() {
         var onCompleteCalled = false;
         var result = when(
             () => new Future.value(5),
-            (x) {
+            onSuccess: (x) {
               expect(x, 5);
               onSuccessCalled = true;
               return 10;
@@ -119,7 +120,7 @@ main() {
         var onCompleteCalled = false;
         var result = when(
             () => new Future.error('e'),
-            (_) => onSuccessCalled = true,
+            onSuccess: (_) => onSuccessCalled = true,
             onError: (e) {
               expect(e, 'e');
               onErrorCalled = true;
@@ -142,7 +143,6 @@ main() {
         var onErrorCalled = false;
         return when(
             () => new Future.error('e'),
-            (_) {},
             onError: (e, s) {
               onErrorCalled = true;
               // TODO: Why is the stack trace null?
@@ -154,8 +154,7 @@ main() {
 
       test('should throw callback error if no onError provided', () {
         return when(
-            () => new Future.error('e'),
-            (x) {}
+            () => new Future.error('e')
         ).then((_) {
           fail('callback error was swallowed');
         }, onError: (e) {
@@ -163,10 +162,15 @@ main() {
         });
       });
 
+      test('should just return callback result if onSuccess not provided', () {
+        return when(() => new Future.value(5)).then((result) {
+          expect(result, 5);
+        });
+      });
+
       test('should not swallow onComplete error', () {
         return when(
             () => new Future.value(),
-            (x) {},
             onComplete: () => throw 'e')
             .then((ret) {
               fail('onComplete error was swallowed');

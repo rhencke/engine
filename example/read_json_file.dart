@@ -24,8 +24,8 @@ _readJsonFile(String path, onAbsent(), exists(File file), read(File file)) {
   var file = new File(path);
   return when(
       () => exists(file),
-      (doesExist) => doesExist ?
-          when(() => read(file), JSON.decode) :
+      onSuccess: (doesExist) => doesExist ?
+          when(() => read(file), onSuccess: JSON.decode) :
           onAbsent());
 }
 

@@ -10,17 +10,18 @@ import 'dart:async';
 /// [onComplete] that are provided are registered on the future,
 /// and the resulting future is returned.
 ///
-/// Otherwise, if [callback] did not throw, [onSuccess] is called with the
-/// result of [callback], and the return value of [onSuccess] is captured.
+/// Otherwise, if [callback] did not throw, if [onSuccess] is provided, it is
+/// called with the with the result of [callback], and the return value of
+/// [onSuccess] is captured.
 ///
 /// Otherwise, if [onError] was provided, it is called.  It can take either
 /// just an error, or a stack trace as well.  If [onError] was not provided,
-/// the error is thrown not caught.
+/// the error is not caught.
 ///
 /// [onComplete] is then called synchronously.
 ///
 /// The captured value is then returned.
-when(callback, onSuccess(result), {onError, onComplete}) {
+when(callback, {onSuccess(result), onError, onComplete}) {
   var result, hasResult = false;
 
   try {
@@ -41,11 +42,20 @@ when(callback, onSuccess(result), {onError, onComplete}) {
     }
   } finally {
     if (result is Future) {
-      result = result.then(onSuccess, onError: onError);
-      if (onComplete != null) result = result.whenComplete(onComplete);
+      if (onSuccess != null) {
+        result = result.then(onSuccess);
+      }
+      if (onError != null) {
+        result = result.catchError(onError);
+      }
+      if (onComplete != null) {
+        result = result.whenComplete(onComplete);
+      }
     } else {
       if (hasResult) {
-        result = onSuccess(result);
+        if (onSuccess != null) {
+          result = onSuccess(result);
+        }
       }
       if (onComplete != null) onComplete();
     }
