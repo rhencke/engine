@@ -1,4 +1,4 @@
-when [![pub package](http://img.shields.io/pub/v/when.svg)](https://pub.dartlang.org/packages/when)[![Build Status](https://travis-ci.org/dart-lang/when.svg?branch=master)](https://travis-ci.org/dart-lang/when) [![Coverage Status](https://coveralls.io/repos/dart-lang/when/badge.svg)](https://coveralls.io/r/dart-lang/when)
+when [![pub package](http://img.shields.io/pub/v/when.svg)](https://pub.dartlang.org/packages/when) [![Build Status](https://travis-ci.org/dart-lang/when.svg?branch=master)](https://travis-ci.org/dart-lang/when) [![Coverage Status](https://coveralls.io/repos/dart-lang/when/badge.svg)](https://coveralls.io/r/dart-lang/when)
 ====
 
 It's often useful to provide sync (convenient) and async (concurrent) versions 
