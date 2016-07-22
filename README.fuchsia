@@ -26,3 +26,6 @@ This is harfbuzz, a text shaping engine.
    src/*.rl src/hb-uniscribe.cc src/hb-directwrite.cc src/hb-directwrite.h \
    src/*.tmpl src/sample.py src/hb-ucdn
 - Added BUILD.gn, README.fuchsia
+
+- Applied a local fix for an infinite recursion crash in hb-coretext on OS X 10.9,
+  skipping the font cascade list reconfiguration on this OS version.
