@@ -39,7 +39,7 @@
 %define output_data(b)  (b)+28          ; JSAMPARRAY output_data
 
         align   16
-        global  EXTN(jsimd_h2v1_downsample_sse2)
+        global  EXTN(jsimd_h2v1_downsample_sse2) PRIVATE
 
 EXTN(jsimd_h2v1_downsample_sse2):
         push    ebp
@@ -194,7 +194,7 @@ EXTN(jsimd_h2v1_downsample_sse2):
 %define output_data(b)  (b)+28          ; JSAMPARRAY output_data
 
         align   16
-        global  EXTN(jsimd_h2v2_downsample_sse2)
+        global  EXTN(jsimd_h2v2_downsample_sse2) PRIVATE
 
 EXTN(jsimd_h2v2_downsample_sse2):
         push    ebp

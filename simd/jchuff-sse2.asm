@@ -26,7 +26,7 @@
         SECTION SEG_CONST
 
         alignz  16
-        global  EXTN(jconst_huff_encode_one_block)
+        global  EXTN(jconst_huff_encode_one_block) PRIVATE
 
 EXTN(jconst_huff_encode_one_block):
 
@@ -179,7 +179,7 @@ EXTN(jconst_huff_encode_one_block):
 %define put_bits        edi
 
         align   16
-        global  EXTN(jsimd_huff_encode_one_block_sse2)
+        global  EXTN(jsimd_huff_encode_one_block_sse2) PRIVATE
 
 EXTN(jsimd_huff_encode_one_block_sse2):
         push    ebp
