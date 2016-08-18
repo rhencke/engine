@@ -77,10 +77,7 @@ if (current_cpu == "x86" || current_cpu == "x64") {
         "PIC",
       ]
     }
-    if (is_linux || is_android) {
-      defines += [ "ELF" ]
-      include_dirs = [ "linux" ]
-    }
+    defines += [ "ELF" ]
   }
 }
 static_library("simd") {
