@@ -1,0 +1,28 @@
+Name: harfbuzz
+Short Name: harfbuzz
+URL: http://harfbuzz.org
+Version: 1.3.0
+Date: 20160819
+Security Critical: yes
+License: MIT
+License File: COPYING
+
+Description:
+This is harfbuzz, a text shaping engine.
+
+- Added some files from release tarball to avoid needing to generate them
+  (tarball at http://www.freedesktop.org/software/harfbuzz/release/)
+  src/hb-buffer-deserialize-json.hh
+  src/hb-buffer-deserialize-text.hh
+  src/hb-ot-shape-complex-indic-machine.hh
+  src/hb-ot-shape-complex-myanmar-machine.hh
+  src/hb-ot-shape-complex-use-machine.hh
+  src/hb-version.h
+- Removed unneeded files
+  rm -rf \
+   .travis.yml .ci/ src/Makefile* src/check*sh src/gen*py src/*.in \
+   win32/ util/ test/ m4/ harfbuzz.doap git.mk docs/ configure.ac autogen.sh \
+   TODO THANKS BUILD.md Android.mk AUTHORS README.python Makefile.am \
+   src/*.rl src/hb-uniscribe.cc src/hb-directwrite.cc src/hb-directwrite.h \
+   src/*.tmpl src/sample.py src/hb-ucdn
+- Added BUILD.gn, README.fuchsia
