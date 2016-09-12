@@ -4,7 +4,14 @@ config("freetype_config") {
   ]
 }
 
-source_set("freetype") {
+#TODO(mikejurka): Remove once we've migrated to the freetype2 target everywhere
+group("freetype") {
+  public_deps = [
+    ":freetype2",
+  ]
+}
+
+source_set("freetype2") {
   sources = [
     # The following files are not sorted alphabetically, but in the
     # same order as in Android.mk to ease maintenance.
