@@ -13,30 +13,39 @@ group("freetype") {
 
 source_set("freetype2") {
   sources = [
-    # The following files are not sorted alphabetically, but in the
-    # same order as in Android.mk to ease maintenance.
+    "src/autofit/autofit.c",
+    "src/base/ftbase.c",
     "src/base/ftbbox.c",
     "src/base/ftbitmap.c",
     "src/base/ftfntfmt.c",
     "src/base/ftfstype.c",
-    "src/base/ftglyph.c",
-    "src/base/ftlcdfil.c",
-    "src/base/ftstroke.c",
-    "src/base/fttype1.c",
-    "src/base/ftbase.c",
-    "src/base/ftsystem.c",
-    "src/base/ftinit.c",
     "src/base/ftgasp.c",
+    "src/base/ftglyph.c",
+    "src/base/ftinit.c",
+    "src/base/ftlcdfil.c",
     "src/base/ftmm.c",
+    "src/base/ftstroke.c",
+    "src/base/ftsystem.c",
+    "src/base/fttype1.c",
     "src/gzip/ftgzip.c",
+    "src/lzw/ftlzw.c",
+    "src/psaux/psaux.c",
+    "src/pshinter/pshinter.c",
+    "src/psnames/psnames.c",
     "src/raster/raster.c",
     "src/sfnt/sfnt.c",
     "src/smooth/smooth.c",
-    "src/autofit/autofit.c",
-    "src/truetype/truetype.c",
-    "src/cff/cff.c",
-    "src/psnames/psnames.c",
-    "src/pshinter/pshinter.c",
+
+    # Font Drivers. Drivers need to be enabled in ftmodule.h explicitly.
+    "src/bdf/bdf.c",           # Glyph Bitmap Distribution Format
+    "src/cff/cff.c",           # OpenType, (.cff, .cef)
+    "src/cid/type1cid.c",      # Postscript CID-keyed (.pfb, .pfa)
+    "src/pcf/pcf.c",           # Portable Compiled Format
+    "src/pfr/pfr.c",           # Portable Font Resource
+    "src/truetype/truetype.c", # TrueType
+    "src/type1/type1.c",       # Postscript Type 1 (.pfb, .pfa)
+    "src/type42/type42.c",     # Postscript Type 42
+    "src/winfonts/winfnt.c",   # Windows Bitmap Fonts, (.fon, .fnt)
   ]
 
   defines = [
