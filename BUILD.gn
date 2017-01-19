@@ -29,6 +29,16 @@ config("rapidjson_config") {
   include_dirs = [
     ".",
   ]
+
+  # rapidjson needs these defines to support C++11 features. These features
+  # are intentionally not autodetected by rapidjson.
+  defines = [
+    "RAPIDJSON_HAS_STDSTRING",
+    "RAPIDJSON_HAS_CXX11_RANGE_FOR",
+    "RAPIDJSON_HAS_CXX11_RVALUE_REFS",
+    "RAPIDJSON_HAS_CXX11_TYPETRAITS",
+    "RAPIDJSON_HAS_CXX11_NOEXCEPT",
+  ]
 }
 
 source_set("rapidjson") {
