@@ -12,6 +12,10 @@ config("harfbuzz_warnings") {
     cflags += [
       "-Wno-unused-value",
 
+      "-Wno-tautological-compare",
+
+      "-Wno-parentheses-equality",
+
       # Harfbuzz uses unused typedefs for its static asserts (and its
       # static asserts are strange enough that they can't be replaced
       # by static_assert).
