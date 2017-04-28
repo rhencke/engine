@@ -10,8 +10,11 @@ if (current_cpu == "arm") {
 
 if (current_cpu == "x86" || current_cpu == "x64") {
   import("//third_party/yasm/yasm_assemble.gni")
+
   yasm_assemble("simd_asm") {
+
     defines = []
+
     if (current_cpu == "x86") {
       sources = [
         "simd/jccolor-mmx.asm",
@@ -49,6 +52,7 @@ if (current_cpu == "x86" || current_cpu == "x64") {
         "simd/jquanti-sse2.asm",
         "simd/jsimdcpu.asm",
       ]
+
       defines += [
         "__x86__",
         "PIC",
@@ -72,19 +76,27 @@ if (current_cpu == "x86" || current_cpu == "x64") {
         "simd/jquantf-sse2-64.asm",
         "simd/jquanti-sse2-64.asm",
       ]
+
       defines += [
         "__x86_64__",
         "PIC",
       ]
     }
+
     defines += [ "ELF" ]
   }
 }
+
 static_library("simd") {
-  if (current_cpu == "x86") {
+  if (!is_fuchsia) {
+    sources = [
+      "jsimd_none.c",
+    ]
+  } else if (current_cpu == "x86") {
     deps = [
       ":simd_asm",
     ]
+
     sources = [
       "simd/jsimd_i386.c",
     ]
@@ -92,6 +104,7 @@ static_library("simd") {
     deps = [
       ":simd_asm",
     ]
+
     sources = [
       "simd/jsimd_x86_64.c",
     ]
@@ -112,9 +125,11 @@ static_library("simd") {
     ]
   }
 }
+
 config("libjpeg_config") {
   include_dirs = [ "." ]
 }
+
 static_library("libjpeg") {
   sources = [
     "jcapimin.c",
@@ -173,11 +188,14 @@ static_library("libjpeg") {
     "jutils.c",
     "jversion.h",
   ]
+
   defines = [
     "WITH_SIMD",
     "NO_GETENV",
   ]
+
   configs += [ ":libjpeg_config" ]
+
   public_configs = [ ":libjpeg_config" ]
 
   deps = [
