@@ -177,15 +177,15 @@ set_indic_properties (hb_glyph_info_t &info)
    */
 
   /* The following act more like the Bindus. */
-  if (unlikely (hb_in_range (u, 0x0953u, 0x0954u)))
+  if (unlikely (hb_in_range<hb_codepoint_t> (u, 0x0953u, 0x0954u)))
     cat = OT_SM;
   /* The following act like consonants. */
-  else if (unlikely (hb_in_ranges (u, 0x0A72u, 0x0A73u,
+  else if (unlikely (hb_in_ranges<hb_codepoint_t> (u, 0x0A72u, 0x0A73u,
 				      0x1CF5u, 0x1CF6u)))
     cat = OT_C;
   /* TODO: The following should only be allowed after a Visarga.
    * For now, just treat them like regular tone marks. */
-  else if (unlikely (hb_in_range (u, 0x1CE2u, 0x1CE8u)))
+  else if (unlikely (hb_in_range<hb_codepoint_t> (u, 0x1CE2u, 0x1CE8u)))
     cat = OT_A;
   /* TODO: The following should only be allowed after some of
    * the nasalization marks, maybe only for U+1CE9..U+1CF1.
@@ -193,15 +193,24 @@ set_indic_properties (hb_glyph_info_t &info)
   else if (unlikely (u == 0x1CEDu))
     cat = OT_A;
   /* The following take marks in standalone clusters, similar to Avagraha. */
-  else if (unlikely (hb_in_ranges (u, 0xA8F2u, 0xA8F7u,
+  else if (unlikely (hb_in_ranges<hb_codepoint_t> (u, 0xA8F2u, 0xA8F7u,
 				      0x1CE9u, 0x1CECu,
 				      0x1CEEu, 0x1CF1u)))
   {
     cat = OT_Symbol;
     ASSERT_STATIC ((int) INDIC_SYLLABIC_CATEGORY_AVAGRAHA == OT_Symbol);
   }
+  else if (unlikely (hb_in_range<hb_codepoint_t> (u, 0x17CDu, 0x17D1u) ||
+		     u == 0x17CBu || u == 0x17D3u || u == 0x17DDu)) /* Khmer Various signs */
+  {
+    /* These can occur mid-syllable (eg. before matras), even though Unicode marks them as Syllable_Modifier.
+     * https://github.com/roozbehp/unicode-data/issues/5 */
+    cat = OT_M;
+    pos = POS_ABOVE_C;
+  }
+
   else if (unlikely (u == 0x17C6u)) cat = OT_N; /* Khmer Bindu doesn't like to be repositioned. */
-  else if (unlikely (hb_in_range (u, 0x2010u, 0x2011u)))
+  else if (unlikely (hb_in_range<hb_codepoint_t> (u, 0x2010u, 0x2011u)))
 				    cat = OT_PLACEHOLDER;
   else if (unlikely (u == 0x25CCu)) cat = OT_DOTTEDCIRCLE;
 
@@ -411,12 +420,12 @@ collect_features_indic (hb_ot_shape_planner_t *plan)
   unsigned int i = 0;
   map->add_gsub_pause (initial_reordering);
   for (; i < INDIC_BASIC_FEATURES; i++) {
-    map->add_feature (indic_features[i].tag, 1, indic_features[i].flags | F_MANUAL_ZWJ);
+    map->add_feature (indic_features[i].tag, 1, indic_features[i].flags | F_MANUAL_ZWJ | F_MANUAL_ZWNJ);
     map->add_gsub_pause (NULL);
   }
   map->add_gsub_pause (final_reordering);
   for (; i < INDIC_NUM_FEATURES; i++) {
-    map->add_feature (indic_features[i].tag, 1, indic_features[i].flags | F_MANUAL_ZWJ);
+    map->add_feature (indic_features[i].tag, 1, indic_features[i].flags | F_MANUAL_ZWJ | F_MANUAL_ZWNJ);
   }
 
   map->add_global_bool_feature (HB_TAG('c','a','l','t'));
@@ -615,6 +624,8 @@ setup_syllables (const hb_ot_shape_plan_t *plan HB_UNUSED,
 		 hb_buffer_t *buffer)
 {
   find_syllables (buffer);
+  foreach_syllable (buffer, start, end)
+    buffer->unsafe_to_break (start, end);
 }
 
 static int
@@ -1497,7 +1508,7 @@ final_reordering_syllable (const hb_ot_shape_plan_t *plan,
     if (reph_pos == REPH_POS_AFTER_SUB)
     {
       new_reph_pos = base;
-      while (new_reph_pos < end &&
+      while (new_reph_pos + 1 < end &&
 	     !( FLAG_SAFE (info[new_reph_pos + 1].indic_position()) & (FLAG (POS_POST_C) | FLAG (POS_AFTER_POST) | FLAG (POS_SMVD))))
 	new_reph_pos++;
       if (new_reph_pos < end)
@@ -1713,37 +1724,32 @@ decompose_indic (const hb_ot_shape_normalize_context_t *c,
   switch (ab)
   {
     /* Don't decompose these. */
-    case 0x0931u  : return false;
-    case 0x0B94u  : return false;
+    case 0x0931u  : return false; /* DEVANAGARI LETTER RRA */
+    case 0x0B94u  : return false; /* TAMIL LETTER AU */
 
 
     /*
      * Decompose split matras that don't have Unicode decompositions.
      */
 
-    case 0x0F77u  : *a = 0x0FB2u; *b= 0x0F81u; return true;
-    case 0x0F79u  : *a = 0x0FB3u; *b= 0x0F81u; return true;
+    /* Khmer */
     case 0x17BEu  : *a = 0x17C1u; *b= 0x17BEu; return true;
     case 0x17BFu  : *a = 0x17C1u; *b= 0x17BFu; return true;
     case 0x17C0u  : *a = 0x17C1u; *b= 0x17C0u; return true;
     case 0x17C4u  : *a = 0x17C1u; *b= 0x17C4u; return true;
     case 0x17C5u  : *a = 0x17C1u; *b= 0x17C5u; return true;
-    case 0x1925u  : *a = 0x1920u; *b= 0x1923u; return true;
-    case 0x1926u  : *a = 0x1920u; *b= 0x1924u; return true;
-    case 0x1B3Cu  : *a = 0x1B42u; *b= 0x1B3Cu; return true;
-    case 0x1112Eu  : *a = 0x11127u; *b= 0x11131u; return true;
-    case 0x1112Fu  : *a = 0x11127u; *b= 0x11132u; return true;
+
 #if 0
+    /* Gujarati */
     /* This one has no decomposition in Unicode, but needs no decomposition either. */
     /* case 0x0AC9u  : return false; */
+
+    /* Oriya */
     case 0x0B57u  : *a = no decomp, -> RIGHT; return true;
-    case 0x1C29u  : *a = no decomp, -> LEFT; return true;
-    case 0xA9C0u  : *a = no decomp, -> RIGHT; return true;
-    case 0x111BuF  : *a = no decomp, -> ABOVE; return true;
 #endif
   }
 
-  if ((ab == 0x0DDAu || hb_in_range (ab, 0x0DDCu, 0x0DDEu)))
+  if ((ab == 0x0DDAu || hb_in_range<hb_codepoint_t> (ab, 0x0DDCu, 0x0DDEu)))
   {
     /*
      * Sinhala split matras...  Let the fun begin.
@@ -1819,6 +1825,7 @@ const hb_ot_complex_shaper_t _hb_ot_complex_shaper_indic =
   decompose_indic,
   compose_indic,
   setup_masks_indic,
+  NULL, /* disable_otl */
   HB_OT_SHAPE_ZERO_WIDTH_MARKS_NONE,
   false, /* fallback_position */
 };

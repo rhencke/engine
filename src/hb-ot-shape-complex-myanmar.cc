@@ -175,7 +175,7 @@ set_myanmar_properties (hb_glyph_info_t &info)
   /* Myanmar
    * http://www.microsoft.com/typography/OpenTypeDev/myanmar/intro.htm#analyze
    */
-  if (unlikely (hb_in_range (u, 0xFE00u, 0xFE0Fu)))
+  if (unlikely (hb_in_range<hb_codepoint_t> (u, 0xFE00u, 0xFE0Fu)))
     cat = (indic_category_t) OT_VS;
 
   switch (u)
@@ -297,6 +297,8 @@ setup_syllables (const hb_ot_shape_plan_t *plan HB_UNUSED,
 		 hb_buffer_t *buffer)
 {
   find_syllables (buffer);
+  foreach_syllable (buffer, start, end)
+    buffer->unsafe_to_break (start, end);
 }
 
 static int
@@ -521,6 +523,7 @@ const hb_ot_complex_shaper_t _hb_ot_complex_shaper_myanmar_old =
   NULL, /* decompose */
   NULL, /* compose */
   NULL, /* setup_masks */
+  NULL, /* disable_otl */
   HB_OT_SHAPE_ZERO_WIDTH_MARKS_BY_GDEF_LATE,
   true, /* fallback_position */
 };
@@ -538,6 +541,7 @@ const hb_ot_complex_shaper_t _hb_ot_complex_shaper_myanmar =
   NULL, /* decompose */
   NULL, /* compose */
   setup_masks_myanmar,
+  NULL, /* disable_otl */
   HB_OT_SHAPE_ZERO_WIDTH_MARKS_BY_GDEF_EARLY,
   false, /* fallback_position */
 };
