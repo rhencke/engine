@@ -12,6 +12,10 @@ config("harfbuzz_warnings") {
     cflags += [
       "-Wno-unused-value",
 
+      # Harfbuzz defines variables that are only used in certain assertions that
+      # are stripped away in some build variants.
+      "-Wno-unused-variable",
+
       "-Wno-tautological-compare",
 
       "-Wno-parentheses-equality",
