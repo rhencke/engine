@@ -44,6 +44,7 @@ config("rapidjson_config") {
 source_set("rapidjson") {
   sources = [
     "rapidjson/allocators.h",
+    "rapidjson/cursorstreamwrapper.h",
     "rapidjson/document.h",
     "rapidjson/encodedstream.h",
     "rapidjson/encodings.h",

@@ -8,6 +8,8 @@ upstream repo. If changing the repository structure, please keep in mind that
 the upstream repo contains third-party elements (outside of `include`) under
 non-standard license that we do not want to pull in.
 
+Version: 3b638e67150783303aebf1fc0789d6c44a026b53
+
 ## rolling forward
 
 Grab a copy of the upstream repository:
@@ -38,5 +40,5 @@ rm -rf rapidjson
 cp -r UPSTREAM_RAPIDJSON_DIR/include/rapidjson .
 ```
 
-Update `BUILD.gn` as needed, `git add .`, `git commit` and upload the roll for
-review.
+Update `BUILD.gn` as needed. Update this file to include the new version
+of the repo. Run `git add .`, `git commit` and upload the roll for review.
