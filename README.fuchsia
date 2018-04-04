@@ -1,12 +1,12 @@
 Name: libjpeg-turbo
-URL: https://github.com/libjpeg-turbo/libjpeg-turbo/
+Upstream git: https://github.com/libjpeg-turbo/libjpeg-turbo/
 Version: 1.5.0
 License: Custom license
 License File: LICENSE.md
 Security Critical: yes
 License Android Compatible: yes
-
 Description:
+
 This consists of the components:
 * libjpeg-turbo 1.5.0
 * This file (README.fuchsia)
