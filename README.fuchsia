@@ -1,1 +1,5 @@
-Upstream Git: https://github.com/google/googletest
+Name: Google Test
+Upstream git: https://github.com/google/googletest
+Description:
+
+Google's C++ test framework.
