@@ -1,1 +1,5 @@
-Upstream Git: https://github.com/google/benchmark
+Name: benchmark
+Upstream git: https://github.com/google/benchmark
+Description:
+
+A library to support the benchmarking of functions, similar to unit-tests.
