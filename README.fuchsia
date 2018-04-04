@@ -2,6 +2,7 @@ Name: harfbuzz
 Short Name: harfbuzz
 URL: http://harfbuzz.org
 Version: 1.5.0
+Upstream git: https://github.com/harfbuzz/harfbuzz
 Date: 20170823
 Security Critical: yes
 License: MIT
