@@ -15,13 +15,13 @@ static_library("gtest") {
   testonly = true
   public = [
     "googletest/include/gtest/gtest.h",
+    "googletest/include/gtest/gtest-spi.h",
   ]
   sources = [
     "googletest/include/gtest/gtest-death-test.h",
     "googletest/include/gtest/gtest-message.h",
     "googletest/include/gtest/gtest-param-test.h",
     "googletest/include/gtest/gtest-printers.h",
-    "googletest/include/gtest/gtest-spi.h",
     "googletest/include/gtest/gtest-test-part.h",
     "googletest/include/gtest/gtest-typed-test.h",
     "googletest/include/gtest/gtest_pred_impl.h",
