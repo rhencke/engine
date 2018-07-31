@@ -31,7 +31,6 @@
 
 #include "hb-private.hh"
 
-#include "hb-object-private.hh"
 #include "hb-shaper-private.hh"
 #include "hb-shape-plan-private.hh"
 
@@ -53,13 +52,6 @@ struct hb_face_t {
   unsigned int index;			/* Face index in a collection, zero-based. */
   mutable unsigned int upem;		/* Units-per-EM. */
   mutable unsigned int num_glyphs;	/* Number of glyphs. */
-
-  enum dirty_t {
-    DIRTY_NOTHING	= 0x0000,
-    DIRTY_INDEX		= 0x0001,
-    DIRTY_UPEM		= 0x0002,
-    DIRTY_NUM_GLYPHS	= 0x0004,
-  } dirty;
 
   struct hb_shaper_data_t shaper_data;	/* Various shaper data. */
 
@@ -105,8 +97,6 @@ struct hb_face_t {
   HB_INTERNAL void load_upem (void) const;
   HB_INTERNAL void load_num_glyphs (void) const;
 };
-
-HB_MARK_AS_FLAG_T (hb_face_t::dirty_t);
 
 extern HB_INTERNAL const hb_face_t _hb_face_nil;
 

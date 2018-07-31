@@ -1,9 +1,9 @@
 Name: harfbuzz
 Short Name: harfbuzz
 URL: http://harfbuzz.org
-Version: 1.5.0
+Version: 1.8.4
 Upstream git: https://github.com/harfbuzz/harfbuzz
-Date: 20170823
+Date: 20180731
 Security Critical: yes
 License: MIT
 License File: COPYING
@@ -11,11 +11,7 @@ License File: COPYING
 Description:
 This is harfbuzz, a text shaping engine.
 
-- Added some files from release tarball to avoid needing to generate them
-  (tarball at http://www.freedesktop.org/software/harfbuzz/release/)
-  src/hb-buffer-deserialize-json.hh
-  src/hb-buffer-deserialize-text.hh
-  src/hb-ot-shape-complex-*.hh
-  src/hb-version.h
-- Added BUILD.gn and README.fuchsia
-- Removed files not built or referenced by the BUILD.gn
+To upgrade this repo:
+* Pull in the latest updates from https://github.com/harfbuzz/harfbuzz.
+* Modify the BUILD.gn file to update the harfbuzz target for new sources.
+* Update version numbers and date in this document.
