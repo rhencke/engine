@@ -30,6 +30,15 @@ config("freetype_config") {
   include_dirs = [
     "include",
   ]
+
+  cflags = []
+
+  if (is_clang) {
+    cflags += [
+      "-Wno-unused-function",
+      "-Wno-unused-variable",
+    ]
+  }
 }
 
 #TODO(mikejurka): Remove once we've migrated to the freetype2 target everywhere
@@ -45,12 +54,10 @@ source_set("freetype2") {
     "src/base/ftbase.c",
     "src/base/ftbbox.c",
     "src/base/ftbitmap.c",
-    "src/base/ftfntfmt.c",
     "src/base/ftfstype.c",
     "src/base/ftgasp.c",
     "src/base/ftglyph.c",
     "src/base/ftinit.c",
-    "src/base/ftlcdfil.c",
     "src/base/ftmm.c",
     "src/base/ftstroke.c",
     "src/base/ftsystem.c",
