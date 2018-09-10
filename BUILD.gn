@@ -90,6 +90,8 @@ source_set("freetype2") {
     # Long directory name to avoid accidentally using wrong headers.
     "FT_CONFIG_MODULES_H=<freetype-fuchsia-config/ftmodule.h>",
     "FT_CONFIG_OPTIONS_H=<freetype-fuchsia-config/ftoption.h>",
+    # Reduce visibility of symbols.
+    "FT_EXPORT(x)=x",
   ]
 
   public_configs = [ ":freetype_config" ]
