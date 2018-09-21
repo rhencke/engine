@@ -39,7 +39,16 @@ group("freetype") {
   ]
 }
 
-source_set("freetype2") {
+# Shared libs are disabled in host toolchain.
+shared_lib = (current_toolchain != host_toolchain)
+
+if (shared_lib) {
+  library_type = "shared_library"
+} else {
+  library_type = "source_set"
+}
+
+target(library_type, "freetype2") {
   sources = [
     "src/autofit/autofit.c",
     "src/base/ftbase.c",
@@ -84,6 +93,14 @@ source_set("freetype2") {
     "FT_CONFIG_MODULES_H=<freetype-fuchsia-config/ftmodule.h>",
     "FT_CONFIG_OPTIONS_H=<freetype-fuchsia-config/ftoption.h>",
   ]
+
+  if (shared_lib) {
+    defines += [
+      "FT_EXPORT(x)=extern __attribute__(( visibility( \"default\" ) )) x",
+      "FT_EXPORT_DEF(x)=extern __attribute__(( visibility( \"default\" ) )) x",
+      "FT_EXPORT_VAR(x)=extern __attribute__(( visibility( \"default\" ) )) x",
+    ]
+  }
 
   public_configs = [ ":freetype_config" ]
 
