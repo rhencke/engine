@@ -1,0 +1,37 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# We add this copy target in order to support //third_party/tink. Tink expects
+# include files for rapidjson to be under the directory include/rapidjson, so
+# simply adding an include directory to the cflags is not sufficient. See CB-181
+# for more details.
+copy("copyfiles") {
+  sources = [
+    "allocators.h",
+    "cursorstreamwrapper.h",
+    "document.h",
+    "encodedstream.h",
+    "encodings.h",
+    "filereadstream.h",
+    "filewritestream.h",
+    "fwd.h",
+    "istreamwrapper.h",
+    "memorybuffer.h",
+    "memorystream.h",
+    "ostreamwrapper.h",
+    "pointer.h",
+    "prettywriter.h",
+    "rapidjson.h",
+    "reader.h",
+    "schema.h",
+    "stream.h",
+    "stringbuffer.h",
+    "writer.h",
+  ]
+  outputs = ["$target_gen_dir/../include/rapidjson/{{source_file_part}}"]
+  deps = [
+    "internal:copyfiles",
+    "error:copyfiles",
+  ]
+}

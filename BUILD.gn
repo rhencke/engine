@@ -28,6 +28,7 @@
 config("rapidjson_config") {
   include_dirs = [
     ".",
+    "$target_gen_dir",
   ]
 
   # rapidjson needs these defines to support C++11 features. These features
@@ -80,4 +81,8 @@ source_set("rapidjson") {
   ]
 
   public_configs = [ ":rapidjson_config" ]
+
+  deps = [
+    "rapidjson:copyfiles",
+  ]
 }
