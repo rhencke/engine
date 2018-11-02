@@ -27,8 +27,7 @@
 #ifndef HB_OT_MAXP_TABLE_HH
 #define HB_OT_MAXP_TABLE_HH
 
-#include "hb-open-type-private.hh"
-#include "hb-subset-plan.hh"
+#include "hb-open-type.hh"
 
 namespace OT {
 
@@ -118,7 +117,7 @@ struct maxp
     return result;
   }
 
-  static inline void drop_hint_fields (hb_subset_plan_t *plan, maxp *maxp_prime)
+  static inline void drop_hint_fields (hb_subset_plan_t *plan HB_UNUSED, maxp *maxp_prime)
   {
     if (maxp_prime->version.major == 1)
     {
@@ -137,7 +136,7 @@ struct maxp
   FixedVersion<>version;		/* Version of the maxp table (0.5 or 1.0),
 					 * 0x00005000u or 0x00010000u. */
   HBUINT16	numGlyphs;		/* The number of glyphs in the font. */
-/*maxpV1Tail v1Tail[VAR]; */
+/*maxpV1Tail	v1Tail[VAR]; */
   public:
   DEFINE_SIZE_STATIC (6);
 };

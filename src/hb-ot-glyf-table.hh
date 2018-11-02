@@ -27,11 +27,9 @@
 #ifndef HB_OT_GLYF_TABLE_HH
 #define HB_OT_GLYF_TABLE_HH
 
-#include "hb-open-type-private.hh"
+#include "hb-open-type.hh"
 #include "hb-ot-head-table.hh"
 #include "hb-subset-glyf.hh"
-#include "hb-subset-plan.hh"
-#include "hb-subset-private.hh"
 
 namespace OT {
 
@@ -49,14 +47,14 @@ struct loca
 
   static const hb_tag_t tableTag = HB_OT_TAG_loca;
 
-  inline bool sanitize (hb_sanitize_context_t *c) const
+  inline bool sanitize (hb_sanitize_context_t *c HB_UNUSED) const
   {
     TRACE_SANITIZE (this);
     return_trace (true);
   }
 
   protected:
-  HBUINT8		dataZ[VAR];		/* Location data. */
+  UnsizedArrayOf<HBUINT8>	dataZ;		/* Location data. */
   DEFINE_SIZE_ARRAY (0, dataZ);
 };
 
@@ -72,7 +70,7 @@ struct glyf
 {
   static const hb_tag_t tableTag = HB_OT_TAG_glyf;
 
-  inline bool sanitize (hb_sanitize_context_t *c) const
+  inline bool sanitize (hb_sanitize_context_t *c HB_UNUSED) const
   {
     TRACE_SANITIZE (this);
     /* We don't check for anything specific here.  The users of the
@@ -238,9 +236,9 @@ struct glyf
 
       hb_blob_t *head_blob = hb_sanitize_context_t().reference_table<head> (face);
       const head *head_table = head_blob->as<head> ();
-      if (head_table == &Null(head) || (unsigned int) head_table->indexToLocFormat > 1 || head_table->glyphDataFormat != 0)
+      if (head_table->indexToLocFormat > 1 || head_table->glyphDataFormat != 0)
       {
-	/* head table is not present, or in an unknown format.  Leave num_glyphs=0, that takes care of disabling us. */
+	/* Unknown format.  Leave num_glyphs=0, that takes care of disabling us. */
 	hb_blob_destroy (head_blob);
 	return;
       }
@@ -270,7 +268,7 @@ struct glyf
     inline bool get_composite (hb_codepoint_t glyph,
 			       CompositeGlyphHeader::Iterator *composite /* OUT */) const
     {
-      if (this->glyf_table == &Null(glyf) || !num_glyphs)
+      if (unlikely (!num_glyphs))
 	return false;
 
       unsigned int start_offset, end_offset;
@@ -377,13 +375,13 @@ struct glyf
 
       if (short_offset)
       {
-        const HBUINT16 *offsets = (const HBUINT16 *) loca_table->dataZ;
+        const HBUINT16 *offsets = (const HBUINT16 *) loca_table->dataZ.arrayZ;
 	*start_offset = 2 * offsets[glyph];
 	*end_offset   = 2 * offsets[glyph + 1];
       }
       else
       {
-        const HBUINT32 *offsets = (const HBUINT32 *) loca_table->dataZ;
+        const HBUINT32 *offsets = (const HBUINT32 *) loca_table->dataZ.arrayZ;
 
 	*start_offset = offsets[glyph];
 	*end_offset   = offsets[glyph + 1];
@@ -420,7 +418,7 @@ struct glyf
         } while (composite_it.move_to_next());
 
         if ( (uint16_t) last->flags & CompositeGlyphHeader::WE_HAVE_INSTRUCTIONS)
-          *instruction_start = ((char *) last - (char *) glyf_table->dataZ) + last->get_size();
+          *instruction_start = ((char *) last - (char *) glyf_table->dataZ.arrayZ) + last->get_size();
         else
           *instruction_start = end_offset;
         *instruction_end = end_offset;
@@ -485,10 +483,12 @@ struct glyf
   };
 
   protected:
-  HBUINT8		dataZ[VAR];		/* Glyphs data. */
+  UnsizedArrayOf<HBUINT8>	dataZ;		/* Glyphs data. */
 
   DEFINE_SIZE_ARRAY (0, dataZ);
 };
+
+struct glyf_accelerator_t : glyf::accelerator_t {};
 
 } /* namespace OT */
 

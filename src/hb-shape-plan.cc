@@ -24,11 +24,24 @@
  * Google Author(s): Behdad Esfahbod
  */
 
-#include "hb-private.hh"
-#include "hb-shape-plan-private.hh"
-#include "hb-shaper-private.hh"
-#include "hb-font-private.hh"
-#include "hb-buffer-private.hh"
+#include "hb.hh"
+#include "hb-shape-plan.hh"
+#include "hb-shaper.hh"
+#include "hb-font.hh"
+#include "hb-buffer.hh"
+
+
+/**
+ * SECTION:hb-shape-plan
+ * @title: hb-shape-plan
+ * @short_description: Object representing a shaping plan
+ * @include: hb.h
+ *
+ * Shape plans are not used for shaping directly, but can be access to query
+ * certain information about how shaping will perform given a set of input
+ * parameters (script, language, direction, features, etc.)
+ * Most client would not need to deal with shape plans directly.
+ **/
 
 
 static void
@@ -49,11 +62,13 @@ hb_shape_plan_plan (hb_shape_plan_t    *shape_plan,
 
 #define HB_SHAPER_PLAN(shaper) \
 	HB_STMT_START { \
-	  if (hb_##shaper##_shaper_face_data_ensure (shape_plan->face_unsafe)) { \
-	    HB_SHAPER_DATA (shaper, shape_plan) = \
+	  if (hb_##shaper##_shaper_face_data_ensure (shape_plan->face_unsafe)) \
+	  { \
+	    /* XXX-MT-bug What happened to *ensure*ing this?!!!! */ \
+	    HB_SHAPER_DATA (shaper, shape_plan).set_relaxed ( \
 	      HB_SHAPER_DATA_CREATE_FUNC (shaper, shape_plan) (shape_plan, \
 							       user_features, num_user_features, \
-							       coords, num_coords); \
+							       coords, num_coords)); \
 	    shape_plan->shaper_func = _hb_##shaper##_shape; \
 	    shape_plan->shaper_name = #shaper; \
 	    return; \
@@ -62,7 +77,7 @@ hb_shape_plan_plan (hb_shape_plan_t    *shape_plan,
 
   if (likely (!shaper_list)) {
     for (unsigned int i = 0; i < HB_SHAPERS_COUNT; i++)
-      if (0)
+      if (false)
 	;
 #define HB_SHAPER_IMPLEMENT(shaper) \
       else if (shapers[i].func == _hb_##shaper##_shape) \
@@ -71,7 +86,7 @@ hb_shape_plan_plan (hb_shape_plan_t    *shape_plan,
 #undef HB_SHAPER_IMPLEMENT
   } else {
     for (; *shaper_list; shaper_list++)
-      if (0)
+      if (false)
 	;
 #define HB_SHAPER_IMPLEMENT(shaper) \
       else if (0 == strcmp (*shaper_list, #shaper)) \
@@ -87,6 +102,31 @@ hb_shape_plan_plan (hb_shape_plan_t    *shape_plan,
 /*
  * hb_shape_plan_t
  */
+
+DEFINE_NULL_INSTANCE (hb_shape_plan_t) =
+{
+  HB_OBJECT_HEADER_STATIC,
+
+  true, /* default_shaper_list */
+  nullptr, /* face */
+  HB_SEGMENT_PROPERTIES_DEFAULT, /* props */
+
+  nullptr, /* shaper_func */
+  nullptr, /* shaper_name */
+
+  nullptr, /* user_features */
+  0,    /* num_user_featurs */
+
+  nullptr, /* coords */
+  0,    /* num_coords */
+
+  {
+#define HB_SHAPER_IMPLEMENT(shaper) HB_ATOMIC_PTR_INIT (HB_SHAPER_DATA_INVALID),
+#include "hb-shaper-list.hh"
+#undef HB_SHAPER_IMPLEMENT
+  },
+};
+
 
 /**
  * hb_shape_plan_create: (Xconstructor)
@@ -188,30 +228,7 @@ hb_shape_plan_create2 (hb_face_t                     *face,
 hb_shape_plan_t *
 hb_shape_plan_get_empty (void)
 {
-  static const hb_shape_plan_t _hb_shape_plan_nil = {
-    HB_OBJECT_HEADER_STATIC,
-
-    true, /* default_shaper_list */
-    nullptr, /* face */
-    HB_SEGMENT_PROPERTIES_DEFAULT, /* props */
-
-    nullptr, /* shaper_func */
-    nullptr, /* shaper_name */
-
-    nullptr, /* user_features */
-    0,    /* num_user_featurs */
-
-    nullptr, /* coords */
-    0,    /* num_coords */
-
-    {
-#define HB_SHAPER_IMPLEMENT(shaper) HB_SHAPER_DATA_INVALID,
-#include "hb-shaper-list.hh"
-#undef HB_SHAPER_IMPLEMENT
-    }
-  };
-
-  return const_cast<hb_shape_plan_t *> (&_hb_shape_plan_nil);
+  return const_cast<hb_shape_plan_t *> (&Null(hb_shape_plan_t));
 }
 
 /**
@@ -337,12 +354,12 @@ hb_shape_plan_execute (hb_shape_plan_t    *shape_plan,
 
 #define HB_SHAPER_EXECUTE(shaper) \
 	HB_STMT_START { \
-	  return HB_SHAPER_DATA (shaper, shape_plan) && \
+	  return HB_SHAPER_DATA (shaper, shape_plan).get () && \
 		 hb_##shaper##_shaper_font_data_ensure (font) && \
 		 _hb_##shaper##_shape (shape_plan, font, buffer, features, num_features); \
 	} HB_STMT_END
 
-  if (0)
+  if (false)
     ;
 #define HB_SHAPER_IMPLEMENT(shaper) \
   else if (shape_plan->shaper_func == _hb_##shaper##_shape) \
@@ -437,7 +454,7 @@ hb_non_global_user_features_present (const hb_feature_t *user_features,
 }
 
 static inline hb_bool_t
-hb_coords_present (const int *coords,
+hb_coords_present (const int *coords HB_UNUSED,
 		   unsigned int num_coords)
 {
   return num_coords != 0;
@@ -497,7 +514,7 @@ hb_shape_plan_create_cached2 (hb_face_t                     *face,
     /* Choose shaper.  Adapted from hb_shape_plan_plan().
      * Must choose shaper exactly the same way as that function. */
     for (const char * const *shaper_item = shaper_list; *shaper_item; shaper_item++)
-      if (0)
+      if (false)
 	;
 #define HB_SHAPER_IMPLEMENT(shaper) \
       else if (0 == strcmp (*shaper_item, #shaper) && \
@@ -515,7 +532,7 @@ hb_shape_plan_create_cached2 (hb_face_t                     *face,
 
 
 retry:
-  hb_face_t::plan_node_t *cached_plan_nodes = (hb_face_t::plan_node_t *) hb_atomic_ptr_get (&face->shape_plans);
+  hb_face_t::plan_node_t *cached_plan_nodes = face->shape_plans.get ();
 
   /* Don't look for plan in the cache if there were variation coordinates XXX Fix me. */
   if (!hb_coords_present (coords, num_coords))
@@ -550,7 +567,8 @@ retry:
   node->shape_plan = shape_plan;
   node->next = cached_plan_nodes;
 
-  if (!hb_atomic_ptr_cmpexch (&face->shape_plans, cached_plan_nodes, node)) {
+  if (unlikely (!face->shape_plans.cmpexch (cached_plan_nodes, node)))
+  {
     hb_shape_plan_destroy (shape_plan);
     free (node);
     goto retry;
