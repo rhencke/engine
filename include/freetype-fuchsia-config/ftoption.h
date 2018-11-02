@@ -323,7 +323,7 @@ FT_BEGIN_HEADER
   /*   able to synthesize a Unicode charmap out of the glyphs found in the */
   /*   fonts.                                                              */
   /*                                                                       */
-#define FT_CONFIG_OPTION_ADOBE_GLYPH_LIST
+// #define FT_CONFIG_OPTION_ADOBE_GLYPH_LIST
 
 
   /*************************************************************************/
@@ -336,7 +336,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*   Note that the `FOND' resource isn't checked.                        */
   /*                                                                       */
-#define FT_CONFIG_OPTION_MAC_FONTS
+// #define FT_CONFIG_OPTION_MAC_FONTS
 
 
   /*************************************************************************/

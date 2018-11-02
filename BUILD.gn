@@ -48,16 +48,7 @@ group("freetype") {
   ]
 }
 
-# Shared libs are disabled in host toolchain.
-shared_lib = (current_toolchain != host_toolchain)
-
-if (shared_lib) {
-  library_type = "shared_library"
-} else {
-  library_type = "source_set"
-}
-
-target(library_type, "freetype2") {
+target(default_library_type, "freetype2") {
   sources = [
     "src/autofit/autofit.c",
     "src/base/ftbase.c",
@@ -77,20 +68,12 @@ target(library_type, "freetype2") {
     "src/psaux/psaux.c",
     "src/pshinter/pshinter.c",
     "src/psnames/psnames.c",
-    "src/raster/raster.c",
     "src/sfnt/sfnt.c",
     "src/smooth/smooth.c",
 
     # Font Drivers. Drivers need to be enabled in ftmodule.h explicitly.
-    "src/bdf/bdf.c",           # Glyph Bitmap Distribution Format
     "src/cff/cff.c",           # OpenType, (.cff, .cef)
-    "src/cid/type1cid.c",      # Postscript CID-keyed (.pfb, .pfa)
-    "src/pcf/pcf.c",           # Portable Compiled Format
-    "src/pfr/pfr.c",           # Portable Font Resource
     "src/truetype/truetype.c", # TrueType
-    "src/type1/type1.c",       # Postscript Type 1 (.pfb, .pfa)
-    "src/type42/type42.c",     # Postscript Type 42
-    "src/winfonts/winfnt.c",   # Windows Bitmap Fonts, (.fon, .fnt)
   ]
 
   defines = [
@@ -103,7 +86,7 @@ target(library_type, "freetype2") {
     "FT_EXPORT(x)=x",
   ]
 
-  if (shared_lib) {
+  if (default_library_type == "shared_library") {
     defines += [
       "FT_EXPORT(x)=extern __attribute__(( visibility( \"default\" ) )) x",
       "FT_EXPORT_DEF(x)=extern __attribute__(( visibility( \"default\" ) )) x",
