@@ -53,6 +53,13 @@ static_library("gtest") {
   sources -= [ "googletest/src/gtest-all.cc" ]
   public_configs = [ ":gtest_config" ]
   configs += [ ":gtest_private_config" ]
+
+  if (is_fuchsia) {
+    deps = [
+      "//zircon/public/lib/fdio",
+      "//zircon/public/lib/zx",
+    ]
+  }
 }
 
 static_library("gtest_main") {
