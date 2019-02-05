@@ -44,6 +44,7 @@ static_library("gtest") {
     "googletest/src/gtest-death-test.cc",
     "googletest/src/gtest-filepath.cc",
     "googletest/src/gtest-internal-inl.h",
+    "googletest/src/gtest-matchers.cc",
     "googletest/src/gtest-port.cc",
     "googletest/src/gtest-printers.cc",
     "googletest/src/gtest-test-part.cc",
