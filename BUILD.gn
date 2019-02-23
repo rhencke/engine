@@ -17,7 +17,7 @@ config("harfbuzz_warnings") {
   }
 }
 
-static_library("harfbuzz") {
+source_set("harfbuzz_sources") {
   sources = [
     "src/hb-aat-layout-ankr-table.hh",
     "src/hb-aat-layout-bsln-table.hh",
@@ -60,6 +60,8 @@ static_library("harfbuzz") {
     "src/hb-font-private.hh",
     "src/hb-font.h",
     "src/hb-font.hh",
+    "src/hb-ft.h",
+    "src/hb-ft.cc",
     "src/hb-icu.cc",
     "src/hb-icu.h",
     "src/hb-iter.hh",
@@ -235,9 +237,33 @@ static_library("harfbuzz") {
   }
 
   configs += [ ":harfbuzz_warnings" ]
+
+  # Without this modification, almost everything ends up hidden in the shared library, making it
+  # useless for linking.
+  if (current_toolchain == shlib_toolchain) {
+    # Avoid failure when subtracting if not already present.
+    configs += ["//build/config:symbol_visibility_hidden"]
+    configs -= ["//build/config:symbol_visibility_hidden"]
+  }
+
   public_configs = [ ":harfbuzz_config" ]
 
   deps = [
     "//third_party/icu:icuuc",
+    "//third_party/freetype2"
+  ]
+}
+
+static_library("harfbuzz") {
+  output_name = "harfbuzz"
+  public_deps = [
+    ":harfbuzz_sources"
+  ]
+}
+
+shared_library("harfbuzz_shared") {
+  output_name = "harfbuzz"
+  public_deps = [
+    ":harfbuzz_sources",
   ]
 }
