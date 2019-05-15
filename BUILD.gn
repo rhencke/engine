@@ -53,6 +53,7 @@ target(default_library_type, "freetype2") {
     "src/autofit/autofit.c",
     "src/base/ftbase.c",
     "src/base/ftbbox.c",
+    "src/base/ftbdf.c",
     "src/base/ftbitmap.c",
     "src/base/ftfstype.c",
     "src/base/ftgasp.c",
