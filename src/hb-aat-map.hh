@@ -30,26 +30,21 @@
 #include "hb.hh"
 
 
-struct hb_ot_shape_plan_t;
-
 struct hb_aat_map_t
 {
   friend struct hb_aat_map_builder_t;
 
   public:
 
-  inline void init (void)
+  void init ()
   {
     memset (this, 0, sizeof (*this));
     chain_flags.init ();
   }
-  inline void fini (void)
-  {
-    chain_flags.fini ();
-  }
+  void fini () { chain_flags.fini (); }
 
   public:
-  hb_vector_t<hb_mask_t, 1> chain_flags;
+  hb_vector_t<hb_mask_t> chain_flags;
 };
 
 struct hb_aat_map_builder_t
@@ -58,30 +53,20 @@ struct hb_aat_map_builder_t
 
   HB_INTERNAL hb_aat_map_builder_t (hb_face_t *face_,
 				    const hb_segment_properties_t *props_ HB_UNUSED) :
-				      face (face_)
-  {
-    features.init ();
-  }
-
-  ~hb_aat_map_builder_t (void)
-  {
-    features.fini ();
-  }
+				      face (face_) {}
 
   HB_INTERNAL void add_feature (hb_tag_t tag, unsigned int value=1);
 
-  HB_INTERNAL void compile (hb_aat_map_t  &m,
-			    const int    *coords,
-			    unsigned int  num_coords);
+  HB_INTERNAL void compile (hb_aat_map_t  &m);
 
   public:
   struct feature_info_t
   {
-    uint16_t  type;
-    uint16_t  setting;
+    hb_aat_layout_feature_type_t  type;
+    hb_aat_layout_feature_selector_t  setting;
     unsigned  seq; /* For stable sorting only. */
 
-    static int cmp (const void *pa, const void *pb)
+    HB_INTERNAL static int cmp (const void *pa, const void *pb)
     {
       const feature_info_t *a = (const feature_info_t *) pa;
       const feature_info_t *b = (const feature_info_t *) pb;
@@ -89,9 +74,9 @@ struct hb_aat_map_builder_t
 	     (a->seq < b->seq ? -1 : a->seq > b->seq ? 1 : 0);
     }
 
-    int cmp (const short unsigned int *ty) const
+    int cmp (hb_aat_layout_feature_type_t ty) const
     {
-      return (type != *ty) ? (type < *ty ? -1 : 1) : 0;
+      return (type != ty) ? (type < ty ? -1 : 1) : 0;
     }
   };
 
@@ -99,7 +84,7 @@ struct hb_aat_map_builder_t
   hb_face_t *face;
 
   public:
-  hb_vector_t<feature_info_t, 32> features;
+  hb_sorted_vector_t<feature_info_t> features;
 };
 
 

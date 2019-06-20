@@ -28,6 +28,8 @@
 
 #include "hb-ot-cmap-table.hh"
 #include "hb-ot-glyf-table.hh"
+#include "hb-ot-cff1-table.hh"
+#include "hb-ot-cff2-table.hh"
 #include "hb-ot-hmtx-table.hh"
 #include "hb-ot-kern-table.hh"
 #include "hb-ot-name-table.hh"
@@ -40,40 +42,16 @@
 #include "hb-ot-layout-gpos-table.hh"
 
 
-void hb_ot_face_data_t::init0 (hb_face_t *face)
+void hb_ot_face_t::init0 (hb_face_t *face)
 {
   this->face = face;
 #define HB_OT_TABLE(Namespace, Type) Type.init0 ();
-#define HB_OT_ACCELERATOR(Namespace, Type) HB_OT_TABLE (Namespace, Type)
-  HB_OT_TABLES
-#undef HB_OT_ACCELERATOR
+#include "hb-ot-face-table-list.hh"
 #undef HB_OT_TABLE
 }
-void hb_ot_face_data_t::fini (void)
+void hb_ot_face_t::fini ()
 {
 #define HB_OT_TABLE(Namespace, Type) Type.fini ();
-#define HB_OT_ACCELERATOR(Namespace, Type) HB_OT_TABLE (Namespace, Type)
-  HB_OT_TABLES
-#undef HB_OT_ACCELERATOR
+#include "hb-ot-face-table-list.hh"
 #undef HB_OT_TABLE
 }
-
-hb_ot_face_data_t *
-_hb_ot_face_data_create (hb_face_t *face)
-{
-  hb_ot_face_data_t *data = (hb_ot_face_data_t *) calloc (1, sizeof (hb_ot_face_data_t));
-  if (unlikely (!data))
-    return nullptr;
-
-  data->init0 (face);
-
-  return data;
-}
-
-void
-_hb_ot_face_data_destroy (hb_ot_face_data_t *data)
-{
-  data->fini ();
-  free (data);
-}
-

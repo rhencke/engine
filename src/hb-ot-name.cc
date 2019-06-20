@@ -26,9 +26,10 @@
 
 #include "hb.hh"
 
+#ifndef HB_NO_NAME
+
 #include "hb-ot-name-table.hh"
 
-#include "hb-ot-face.hh"
 #include "hb-utf.hh"
 
 
@@ -42,17 +43,10 @@
  **/
 
 
-static inline const OT::name_accelerator_t&
-_get_name (hb_face_t *face)
-{
-  if (unlikely (!hb_ot_shaper_face_data_ensure (face))) return Null(OT::name_accelerator_t);
-  return *(hb_ot_face_data (face)->name.get ());
-}
-
 /**
  * hb_ot_name_list_names:
  * @face: font face.
- * @num_entries: (out): number of returned entries.
+ * @num_entries: (out) (allow-none): number of returned entries.
  *
  * Enumerates all available name IDs and language combinations. Returned
  * array is owned by the @face and should not be modified.  It can be
@@ -65,20 +59,20 @@ const hb_ot_name_entry_t *
 hb_ot_name_list_names (hb_face_t    *face,
 		       unsigned int *num_entries /* OUT */)
 {
-  const OT::name_accelerator_t &name = _get_name (face);
-  *num_entries = name.names.len;
-  return name.names.arrayZ();
+  const OT::name_accelerator_t &name = *face->table.name;
+  if (num_entries) *num_entries = name.names.length;
+  return (const hb_ot_name_entry_t *) name.names;
 }
 
 
 template <typename in_utf_t, typename out_utf_t>
 static inline unsigned int
-hb_ot_name_convert_utf (const hb_bytes_t                *bytes,
+hb_ot_name_convert_utf (hb_bytes_t                       bytes,
 			unsigned int                    *text_size /* IN/OUT */,
 			typename out_utf_t::codepoint_t *text /* OUT */)
 {
-  unsigned int src_len = bytes->len / sizeof (typename in_utf_t::codepoint_t);
-  const typename in_utf_t::codepoint_t *src = (const typename in_utf_t::codepoint_t *) bytes->arrayZ;
+  unsigned int src_len = bytes.length / sizeof (typename in_utf_t::codepoint_t);
+  const typename in_utf_t::codepoint_t *src = (const typename in_utf_t::codepoint_t *) bytes.arrayZ;
   const typename in_utf_t::codepoint_t *src_end = src + src_len;
 
   typename out_utf_t::codepoint_t *dst = text;
@@ -100,7 +94,7 @@ hb_ot_name_convert_utf (const hb_bytes_t                *bytes,
 
       dst = dst_next;
       src = src_next;
-    };
+    }
 
     *text_size = dst - text;
     *dst = 0; /* NUL-terminate. */
@@ -112,7 +106,7 @@ hb_ot_name_convert_utf (const hb_bytes_t                *bytes,
   {
     src = in_utf_t::next (src, src_end, &unicode, replacement);
     dst_len += out_utf_t::encode_len (unicode);
-  };
+  }
   return dst_len;
 }
 
@@ -124,7 +118,7 @@ hb_ot_name_get_utf (hb_face_t       *face,
 		    unsigned int    *text_size /* IN/OUT */,
 		    typename utf_t::codepoint_t *text /* OUT */)
 {
-  const OT::name_accelerator_t &name = _get_name (face);
+  const OT::name_accelerator_t &name = *face->table.name;
 
   if (!language)
     language = hb_language_from_string ("en", 2);
@@ -136,10 +130,10 @@ hb_ot_name_get_utf (hb_face_t       *face,
     hb_bytes_t bytes = name.get_name (idx);
 
     if (width == 2) /* UTF16-BE */
-      return hb_ot_name_convert_utf<hb_utf16_be_t, utf_t> (&bytes, text_size, text);
+      return hb_ot_name_convert_utf<hb_utf16_be_t, utf_t> (bytes, text_size, text);
 
     if (width == 1) /* ASCII */
-      return hb_ot_name_convert_utf<hb_ascii_t, utf_t> (&bytes, text_size, text);
+      return hb_ot_name_convert_utf<hb_ascii_t, utf_t> (bytes, text_size, text);
   }
 
   if (text_size)
@@ -229,3 +223,6 @@ hb_ot_name_get_utf32 (hb_face_t       *face,
 {
   return hb_ot_name_get_utf<hb_utf32_t> (face, name_id, language, text_size, text);
 }
+
+
+#endif

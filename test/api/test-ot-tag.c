@@ -190,7 +190,6 @@ test_ot_tag_script_indic (void)
   test_indic_tags ("ory3", "ory2", "orya", HB_SCRIPT_ORIYA);
   test_indic_tags ("tml3", "tml2", "taml", HB_SCRIPT_TAMIL);
   test_indic_tags ("tel3", "tel2", "telu", HB_SCRIPT_TELUGU);
-  test_indic_tags ("mym3", "mym2", "mymr", HB_SCRIPT_MYANMAR);
 }
 
 
@@ -202,11 +201,11 @@ test_language_two_way (const char *tag_s, const char *lang_s)
 {
   hb_language_t lang = hb_language_from_string (lang_s, -1);
   hb_tag_t tag = hb_tag_from_string (tag_s, -1);
+  hb_tag_t tag2;
+  unsigned int count = 1;
 
   g_test_message ("Testing language %s <-> tag %s", lang_s, tag_s);
 
-  hb_tag_t tag2;
-  unsigned int count = 1;
   hb_ot_tags_from_script_and_language (HB_SCRIPT_INVALID,
 				       lang,
 				       NULL, NULL, &count, &tag2);
@@ -223,11 +222,11 @@ test_tag_from_language (const char *tag_s, const char *lang_s)
 {
   hb_language_t lang = hb_language_from_string (lang_s, -1);
   hb_tag_t tag = hb_tag_from_string (tag_s, -1);
+  hb_tag_t tag2;
+  unsigned int count = 1;
 
   g_test_message ("Testing language %s -> tag %s", lang_s, tag_s);
 
-  hb_tag_t tag2;
-  unsigned int count = 1;
   hb_ot_tags_from_script_and_language (HB_SCRIPT_INVALID,
 				       lang,
 				       NULL, NULL, &count, &tag2);
@@ -280,6 +279,8 @@ test_ot_tag_language (void)
 {
   g_assert_cmphex (HB_TAG_CHAR4 ("dflt"), ==, HB_OT_TAG_DEFAULT_LANGUAGE);
   test_language_two_way ("dflt", NULL);
+
+  test_language_two_way ("ALT", "alt");
 
   test_language_two_way ("ARA", "ar");
 
@@ -353,7 +354,8 @@ test_ot_tag_language (void)
   test_tag_from_language ("ZHS", "zh"); /* Chinese */
   test_tag_from_language ("ZHS", "zh-xx");
 
-  test_language_two_way ("ABC", "x-hbotabc");
+  test_language_two_way ("ABC", "abc");
+  test_language_two_way ("ABCD", "x-hbotabcd");
   test_tag_from_language ("ABC", "asdf-asdf-wer-x-hbotabc-zxc");
   test_tag_from_language ("ABC", "asdf-asdf-wer-x-hbotabc");
   test_tag_from_language ("ABCD", "asdf-asdf-wer-x-hbotabcd");
@@ -449,6 +451,9 @@ test_ot_tag_language (void)
 
   /* A UN M.49 region code, not an extended language subtag */
   test_tag_from_language ("ARA", "ar-001");
+
+  /* An invalid tag */
+  test_tag_from_language ("TRK", "tr@foo=bar");
 }
 
 static void
@@ -464,9 +469,10 @@ test_tags (hb_script_t  script,
   unsigned int i;
   hb_tag_t *script_tags = malloc (script_count * sizeof (hb_tag_t));
   hb_tag_t *language_tags = malloc (language_count * sizeof (hb_tag_t));
+  hb_language_t lang;
   g_assert (script_tags);
   g_assert (language_tags);
-  hb_language_t lang = hb_language_from_string (lang_s, -1);
+  lang = hb_language_from_string (lang_s, -1);
   va_start (expected_tags, expected_language_count);
 
   hb_ot_tags_from_script_and_language (script, lang, &script_count, script_tags, &language_count, language_tags);
@@ -499,6 +505,7 @@ test_ot_tag_full (void)
   test_tags (HB_SCRIPT_INVALID, "x-hbsc5678-hbot1234", HB_OT_MAX_TAGS_PER_SCRIPT, HB_OT_MAX_TAGS_PER_LANGUAGE, 1, 1, "5678", "1234");
   test_tags (HB_SCRIPT_MALAYALAM, "ml", HB_OT_MAX_TAGS_PER_SCRIPT, HB_OT_MAX_TAGS_PER_LANGUAGE, 3, 2, "mlm3", "mlm2", "mlym", "MAL", "MLR");
   test_tags (HB_SCRIPT_MALAYALAM, "ml", 1, 1, 1, 1, "mlm3", "MAL");
+  test_tags (HB_SCRIPT_MYANMAR, "und", HB_OT_MAX_TAGS_PER_SCRIPT, 0, 2, 0, "mym2", "mymr");
   test_tags (HB_SCRIPT_INVALID, "xyz", HB_OT_MAX_TAGS_PER_SCRIPT, HB_OT_MAX_TAGS_PER_LANGUAGE, 0, 1, "XYZ");
   test_tags (HB_SCRIPT_INVALID, "xy", HB_OT_MAX_TAGS_PER_SCRIPT, HB_OT_MAX_TAGS_PER_LANGUAGE, 0, 0);
 }

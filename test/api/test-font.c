@@ -146,9 +146,6 @@ _test_font_nil_funcs (hb_font_t *font)
   glyph = 3;
   g_assert (!hb_font_get_glyph (font, 17, 2, &glyph));
   g_assert_cmpint (glyph, ==, 0);
-
-  x = hb_font_get_glyph_h_kerning (font, 17, 19);
-  g_assert_cmpint (x, ==, 0);
 }
 
 static void
@@ -400,6 +397,7 @@ test_fontfuncs_parallels (void)
   hb_font_t *font0;
   hb_font_t *font1;
   hb_font_t *font2;
+  hb_codepoint_t glyph;
 
   blob = hb_blob_create (test_data, sizeof (test_data), HB_MEMORY_MODE_READONLY, NULL, NULL);
   face = hb_face_create (blob, 0);
@@ -424,7 +422,6 @@ test_fontfuncs_parallels (void)
   hb_font_funcs_destroy (ffuncs2);
 
   /* Just test that calling get_nominal_glyph doesn't infinite-loop. */
-  hb_codepoint_t glyph;
   hb_font_get_nominal_glyph (font2, 0x0020u, &glyph);
 
   hb_font_destroy (font2);
@@ -535,6 +532,11 @@ test_font_properties (void)
   hb_font_get_ppem (font, &x_ppem, &y_ppem);
   g_assert_cmpint (x_ppem, ==, 17);
   g_assert_cmpint (y_ppem, ==, 19);
+
+  /* Check ptem */
+  g_assert_cmpint (hb_font_get_ptem (font), ==, 0);
+  hb_font_set_ptem (font, 42);
+  g_assert_cmpint (hb_font_get_ptem (font), ==, 42);
 
 
   /* Check immutable */

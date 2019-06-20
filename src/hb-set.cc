@@ -47,7 +47,7 @@
  * Since: 0.9.2
  **/
 hb_set_t *
-hb_set_create (void)
+hb_set_create ()
 {
   hb_set_t *set;
 
@@ -67,7 +67,7 @@ hb_set_create (void)
  * Since: 0.9.2
  **/
 hb_set_t *
-hb_set_get_empty (void)
+hb_set_get_empty ()
 {
   return const_cast<hb_set_t *> (&Null(hb_set_t));
 }
@@ -389,6 +389,7 @@ hb_set_symmetric_difference (hb_set_t       *set,
   set->symmetric_difference (other);
 }
 
+#ifndef HB_DISABLE_DEPRECATED
 /**
  * hb_set_invert:
  * @set: a set.
@@ -403,6 +404,7 @@ void
 hb_set_invert (hb_set_t *set HB_UNUSED)
 {
 }
+#endif
 
 /**
  * hb_set_get_population:

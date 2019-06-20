@@ -35,7 +35,6 @@ endif ()
 ## HarfBuzz build configurations
 option(HB_HAVE_FREETYPE "Enable freetype interop helpers" OFF)
 option(HB_HAVE_GRAPHITE2 "Enable Graphite2 complementary shaper" OFF)
-option(HB_BUILTIN_UCDN "Use HarfBuzz provided UCDN" ON)
 option(HB_HAVE_GLIB "Enable glib unicode functions" OFF)
 option(HB_HAVE_ICU "Enable icu unicode functions" OFF)
 if (APPLE)
@@ -70,7 +69,6 @@ option(HB_CHECK OFF "Do a configuration suitable for testing (shared library and
 if (HB_CHECK)
   set (BUILD_SHARED_LIBS ON)
   set (HB_BUILD_UTILS ON)
-  set (HB_BUILTIN_UCDN ON)
   set (HB_HAVE_ICU)
   set (HB_HAVE_GLIB ON)
   #set (HB_HAVE_GOBJECT ON)
@@ -90,8 +88,6 @@ include_directories(AFTER
   ${PROJECT_BINARY_DIR}/src
 )
 
-add_definitions(-DHAVE_FALLBACK)
-
 # We need PYTHON_EXECUTABLE to be set for running the tests...
 include (FindPythonInterp)
 
@@ -110,7 +106,7 @@ endmacro ()
 if (UNIX)
   list(APPEND CMAKE_REQUIRED_LIBRARIES m)
 endif ()
-check_funcs(atexit mprotect sysconf getpagesize mmap isatty newlocale strtod_l round)
+check_funcs(atexit mprotect sysconf getpagesize mmap isatty newlocale strtod_l)
 check_include_file(unistd.h HAVE_UNISTD_H)
 if (${HAVE_UNISTD_H})
   add_definitions(-DHAVE_UNISTD_H)
@@ -160,18 +156,11 @@ endfunction ()
 
 file(READ ${PROJECT_SOURCE_DIR}/src/Makefile.sources SRCSOURCES)
 file(READ ${PROJECT_SOURCE_DIR}/util/Makefile.sources UTILSOURCES)
-file(READ ${PROJECT_SOURCE_DIR}/src/hb-ucdn/Makefile.sources UCDNSOURCES)
 
 extract_make_variable(HB_BASE_sources ${SRCSOURCES})
 add_prefix_to_list(HB_BASE_sources "${PROJECT_SOURCE_DIR}/src/")
 extract_make_variable(HB_BASE_headers ${SRCSOURCES})
 add_prefix_to_list(HB_BASE_headers "${PROJECT_SOURCE_DIR}/src/")
-extract_make_variable(HB_FALLBACK_sources ${SRCSOURCES})
-add_prefix_to_list(HB_FALLBACK_sources "${PROJECT_SOURCE_DIR}/src/")
-extract_make_variable(HB_OT_sources ${SRCSOURCES})
-add_prefix_to_list(HB_OT_sources "${PROJECT_SOURCE_DIR}/src/")
-extract_make_variable(HB_OT_headers ${SRCSOURCES})
-add_prefix_to_list(HB_OT_headers "${PROJECT_SOURCE_DIR}/src/")
 
 extract_make_variable(HB_SUBSET_sources ${SRCSOURCES})
 add_prefix_to_list(HB_SUBSET_sources "${PROJECT_SOURCE_DIR}/src/")
@@ -180,13 +169,10 @@ extract_make_variable(HB_SUBSET_headers ${SRCSOURCES})
 add_prefix_to_list(HB_SUBSET_headers "${PROJECT_SOURCE_DIR}/src/")
 
 extract_make_variable(HB_BASE_RAGEL_GENERATED_sources ${SRCSOURCES})
-extract_make_variable(HB_OT_RAGEL_GENERATED_sources ${SRCSOURCES})
 #if (IN_HB_DIST)
   add_prefix_to_list(HB_BASE_RAGEL_GENERATED_sources "${PROJECT_SOURCE_DIR}/src/")
-  add_prefix_to_list(HB_OT_RAGEL_GENERATED_sources "${PROJECT_SOURCE_DIR}/src/")
 #else ()
 #  add_prefix_to_list(HB_BASE_RAGEL_GENERATED_sources "${PROJECT_BINARY_DIR}/src/")
-#  add_prefix_to_list(HB_OT_RAGEL_GENERATED_sources "${PROJECT_BINARY_DIR}/src/")
 #endif ()
 
 extract_make_variable(HB_VIEW_sources ${UTILSOURCES})
@@ -197,9 +183,6 @@ extract_make_variable(HB_SUBSET_CLI_sources ${UTILSOURCES})
 add_prefix_to_list(HB_SUBSET_CLI_sources "${PROJECT_SOURCE_DIR}/util/")
 extract_make_variable(HB_OT_SHAPE_CLOSURE_sources ${UTILSOURCES})
 add_prefix_to_list(HB_OT_SHAPE_CLOSURE_sources "${PROJECT_SOURCE_DIR}/util/")
-
-extract_make_variable(LIBHB_UCDN_sources ${UCDNSOURCES})
-add_prefix_to_list(LIBHB_UCDN_sources "${PROJECT_SOURCE_DIR}/src/hb-ucdn/")
 
 
 file(READ configure.ac CONFIGUREAC)
@@ -212,7 +195,7 @@ set (HB_VERSION_MICRO ${CMAKE_MATCH_4})
 
 ## Define ragel tasks
 # if (NOT IN_HB_DIST)
-#  foreach (ragel_output IN ITEMS ${HB_BASE_RAGEL_GENERATED_sources} ${HB_OT_RAGEL_GENERATED_sources})
+#  foreach (ragel_output IN ITEMS ${HB_BASE_RAGEL_GENERATED_sources})
 #    string(REGEX MATCH "([^/]+)\\.hh" temp ${ragel_output})
 #    set (target_name ${CMAKE_MATCH_1})
 #    add_custom_command(OUTPUT ${ragel_output}
@@ -244,10 +227,6 @@ set (HB_VERSION_MICRO ${CMAKE_MATCH_4})
 set (project_sources
   ${HB_BASE_sources}
   ${HB_BASE_RAGEL_GENERATED_sources}
-
-  ${HB_FALLBACK_sources}
-  ${HB_OT_sources}
-  ${HB_OT_RAGEL_GENERATED_sources}
 )
 
 set (subset_project_sources
@@ -260,7 +239,6 @@ set (project_headers
   #${HB_VERSION_H}
 
   ${HB_BASE_headers}
-  ${HB_OT_headers}
 )
 
 set (subset_project_headers
@@ -303,14 +281,6 @@ if (HB_HAVE_GRAPHITE2)
   list(APPEND THIRD_PARTY_LIBS ${GRAPHITE2_LIBRARY})
 
   mark_as_advanced(GRAPHITE2_INCLUDE_DIR GRAPHITE2_LIBRARY)
-endif ()
-
-if (HB_BUILTIN_UCDN)
-  include_directories(src/hb-ucdn)
-  add_definitions(-DHAVE_UCDN)
-
-  list(APPEND project_sources ${PROJECT_SOURCE_DIR}/src/hb-ucdn.cc)
-  list(APPEND project_extra_sources ${LIBHB_UCDN_sources})
 endif ()
 
 if (HB_HAVE_GLIB)
@@ -562,7 +532,7 @@ endif ()
 if (UNIX OR MINGW)
   # Make symbols link locally
   include (CheckCXXCompilerFlag)
-  check_cxx_compiler_flag(-Bsymbolic-functions CXX_SUPPORTS_FLAG_BSYMB_FUNCS)
+  CHECK_CXX_COMPILER_FLAG(-Bsymbolic-functions CXX_SUPPORTS_FLAG_BSYMB_FUNCS)
   if (CXX_SUPPORTS_FLAG_BSYMB_FUNCS)
     link_libraries(-Bsymbolic-functions)
   endif ()
@@ -580,7 +550,15 @@ if (UNIX OR MINGW)
     # No threadsafe statics as we do it ourselves
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-threadsafe-statics")
   endif ()
+
+  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+  if (COMPILER_SUPPORTS_CXX11)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  else()
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+  endif()
 endif ()
+
 
 ## Define harfbuzz-gobject library
 if (HB_HAVE_GOBJECT)
@@ -706,6 +684,8 @@ if (HB_HAVE_INTROSPECTION)
       -DHB_H_IN
       -DHB_OT_H
       -DHB_OT_H_IN
+      -DHB_AAT_H
+      -DHB_AAT_H_IN
       -DHB_GOBJECT_H
       -DHB_GOBJECT_H_IN
       -DHB_EXTERN=
@@ -842,21 +822,9 @@ if (NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
   endif ()
 endif ()
 
-if (UNIX AND CMAKE_GENERATOR STREQUAL "Ninja")
-  if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcolor-diagnostics")
-  endif ()
-  if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color")
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fdiagnostics-color")
-  endif ()
-endif ()
-
-
 if (HB_BUILD_TESTS)
   ## src/ executables
-  foreach (prog main test test-would-substitute test-size-params test-buffer-serialize hb-ot-tag test-unicode-ranges)
+  foreach (prog main test test-gsub-would-substitute test-gpos-size-params test-buffer-serialize hb-ot-tag test-unicode-ranges)
     set (prog_name ${prog})
     if (${prog_name} STREQUAL "test")
       # test can not be used as a valid executable name on cmake, lets special case it

@@ -93,6 +93,17 @@ hb_ot_tags_to_script_and_language (hb_tag_t       script_tag,
 HB_EXTERN hb_bool_t
 hb_ot_layout_has_glyph_classes (hb_face_t *face);
 
+/**
+ * hb_ot_layout_glyph_class_t:
+ * @HB_OT_LAYOUT_GLYPH_CLASS_UNCLASSIFIED: Glyphs not matching the other classifications
+ * @HB_OT_LAYOUT_GLYPH_CLASS_BASE_GLYPH: Spacing, single characters, capable of accepting marks
+ * @HB_OT_LAYOUT_GLYPH_CLASS_LIGATURE: Glyphs that represent ligation of multiple characters
+ * @HB_OT_LAYOUT_GLYPH_CLASS_MARK: Non-spacing, combining glyphs that represent marks
+ * @HB_OT_LAYOUT_GLYPH_CLASS_COMPONENT: Spacing glyphs that represent part of a single character
+ *
+ * The GDEF classes defined for glyphs.
+ *
+ **/
 typedef enum {
   HB_OT_LAYOUT_GLYPH_CLASS_UNCLASSIFIED	= 0,
   HB_OT_LAYOUT_GLYPH_CLASS_BASE_GLYPH	= 1,
@@ -390,22 +401,6 @@ hb_ot_layout_feature_get_characters (hb_face_t      *face,
 				     unsigned int    start_offset,
 				     unsigned int   *char_count    /* IN/OUT.  May be NULL */,
 				     hb_codepoint_t *characters    /* OUT.     May be NULL */);
-
-/*
- * BASE
- */
-#if 0
-
-#define HB_OT_TAG_BASE_HANG HB_TAG('h','a','n','g')
-#define HB_OT_TAG_BASE_ICFB HB_TAG('i','c','f','b')
-#define HB_OT_TAG_BASE_ICFT HB_TAG('i','c','f','t')
-#define HB_OT_TAG_BASE_IDEO HB_TAG('i','d','e','o')
-#define HB_OT_TAG_BASE_IDTB HB_TAG('i','d','t','b')
-#define HB_OT_TAG_BASE_MATH HB_TAG('m','a','t','h')
-#define HB_OT_TAG_BASE_ROMN HB_TAG('r','o','m','n')
-
-#endif
-
 
 HB_END_DECLS
 

@@ -23,7 +23,10 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-#include "hb.h"
+#include "hb.hh"
+
+#ifndef HB_NO_COLOR
+
 #include "hb-ot.h"
 
 #include "hb-ft.h"
@@ -40,74 +43,6 @@
 #include <stdio.h>
 
 static void
-png_dump (hb_face_t *face, unsigned int face_index)
-{
-  unsigned glyph_count = hb_face_get_glyph_count (face);
-  hb_font_t *font = hb_font_create (face);
-
-  /* ugly hack, scans the font for strikes, not needed for regular clients */
-  #define STRIKES_MAX 20
-  unsigned int strikes_count = 0;
-  unsigned int strikes[STRIKES_MAX] = {0};
-  {
-    /* find a sample glyph */
-    unsigned int sample_glyph_id;
-    /* we don't care much about different strikes for different glyphs */
-    for (sample_glyph_id = 0; sample_glyph_id < glyph_count; sample_glyph_id++)
-    {
-      hb_blob_t *blob = hb_ot_color_glyph_reference_png (font, sample_glyph_id);
-      unsigned int blob_length = hb_blob_get_length (blob);
-      hb_blob_destroy (blob);
-      if (blob_length != 0)
-	break;
-    }
-    /* find strikes it has */
-    unsigned int upem = hb_face_get_upem (face);
-    unsigned int blob_length = 0;
-    for (unsigned int ppem = 1; ppem <= upem && strikes_count < STRIKES_MAX; ppem++)
-    {
-      hb_font_set_ppem (font, ppem, ppem);
-      hb_blob_t *blob = hb_ot_color_glyph_reference_png (font, sample_glyph_id);
-      unsigned int new_blob_length = hb_blob_get_length (blob);
-      if (blob_length != new_blob_length)
-      {
-	strikes_count++;
-	blob_length = new_blob_length;
-      }
-      if (strikes_count != 0)
-	strikes[strikes_count - 1] = ppem;
-      hb_blob_destroy (blob);
-    }
-    /* can't report the biggest strike correctly, and, we can't do anything about it */
-  }
-  #undef STRIKES_MAX
-
-  for (unsigned int strike = 0; strike < strikes_count; strike++)
-    for (unsigned int glyph_id = 0; glyph_id < glyph_count; glyph_id++)
-    {
-      unsigned int ppem = strikes[strike];
-      hb_font_set_ppem (font, ppem, ppem);
-      hb_blob_t *blob = hb_ot_color_glyph_reference_png (font, glyph_id);
-
-      if (hb_blob_get_length (blob) == 0) continue;
-
-      unsigned int length;
-      const char *data = hb_blob_get_data (blob, &length);
-
-      char output_path[255];
-      sprintf (output_path, "out/png-%d-%d-%d.png", glyph_id, strike, face_index);
-
-      FILE *f = fopen (output_path, "wb");
-      fwrite (data, 1, length, f);
-      fclose (f);
-
-      hb_blob_destroy (blob);
-    }
-
-  hb_font_destroy (font);
-}
-
-static void
 svg_dump (hb_face_t *face, unsigned int face_index)
 {
   unsigned glyph_count = hb_face_get_glyph_count (face);
@@ -122,7 +57,7 @@ svg_dump (hb_face_t *face, unsigned int face_index)
     const char *data = hb_blob_get_data (blob, &length);
 
     char output_path[255];
-    sprintf (output_path, "out/svg-%d-%d.svg%s",
+    sprintf (output_path, "out/svg-%u-%u.svg%s",
 	     glyph_id,
 	     face_index,
 	     // append "z" if the content is gzipped, https://stackoverflow.com/a/6059405
@@ -134,6 +69,63 @@ svg_dump (hb_face_t *face, unsigned int face_index)
 
     hb_blob_destroy (blob);
   }
+}
+
+/* _png API is so easy to use unlike the below code, don't get confused */
+static void
+png_dump (hb_face_t *face, unsigned int face_index)
+{
+  unsigned glyph_count = hb_face_get_glyph_count (face);
+  hb_font_t *font = hb_font_create (face);
+
+  /* scans the font for strikes */
+  unsigned int sample_glyph_id;
+  /* we don't care about different strikes for different glyphs at this point */
+  for (sample_glyph_id = 0; sample_glyph_id < glyph_count; sample_glyph_id++)
+  {
+    hb_blob_t *blob = hb_ot_color_glyph_reference_png (font, sample_glyph_id);
+    unsigned int blob_length = hb_blob_get_length (blob);
+    hb_blob_destroy (blob);
+    if (blob_length != 0)
+      break;
+  }
+
+  unsigned int upem = hb_face_get_upem (face);
+  unsigned int blob_length = 0;
+  unsigned int strike = 0;
+  for (unsigned int ppem = 1; ppem < upem; ppem++)
+  {
+    hb_font_set_ppem (font, ppem, ppem);
+    hb_blob_t *blob = hb_ot_color_glyph_reference_png (font, sample_glyph_id);
+    unsigned int new_blob_length = hb_blob_get_length (blob);
+    hb_blob_destroy (blob);
+    if (new_blob_length != blob_length)
+    {
+      for (unsigned int glyph_id = 0; glyph_id < glyph_count; glyph_id++)
+      {
+	hb_blob_t *blob = hb_ot_color_glyph_reference_png (font, glyph_id);
+
+	if (hb_blob_get_length (blob) == 0) continue;
+
+	unsigned int length;
+	const char *data = hb_blob_get_data (blob, &length);
+
+	char output_path[255];
+	sprintf (output_path, "out/png-%u-%u-%u.png", glyph_id, strike, face_index);
+
+	FILE *f = fopen (output_path, "wb");
+	fwrite (data, 1, length, f);
+	fclose (f);
+
+	hb_blob_destroy (blob);
+      }
+
+      strike++;
+      blob_length = new_blob_length;
+    }
+  }
+
+  hb_font_destroy (font);
 }
 
 static void
@@ -178,9 +170,8 @@ layered_glyph_dump (hb_face_t *face, cairo_font_face_t *cairo_face, unsigned int
 
       // Render
       unsigned int palette_count = hb_ot_color_palette_get_count (face);
-      for (unsigned int palette = 0; palette < palette_count; palette++) {
-	char output_path[255];
-
+      for (unsigned int palette = 0; palette < palette_count; palette++)
+      {
 	unsigned int num_colors = hb_ot_color_palette_get_colors (face, palette, 0, nullptr, nullptr);
 	if (!num_colors)
 	  continue;
@@ -189,7 +180,8 @@ layered_glyph_dump (hb_face_t *face, cairo_font_face_t *cairo_face, unsigned int
 	hb_ot_color_palette_get_colors (face, palette, 0, &num_colors, colors);
 	if (num_colors)
 	{
-	  sprintf (output_path, "out/colr-%d-%d-%d.svg", gid, palette, face_index);
+	  char output_path[255];
+	  sprintf (output_path, "out/colr-%u-%u-%u.svg", gid, palette, face_index);
 
 	  cairo_surface_t *surface = cairo_svg_surface_create (output_path, extents.width, extents.height);
 	  cairo_t *cr = cairo_create (surface);
@@ -256,7 +248,7 @@ dump_glyphs (cairo_font_face_t *cairo_face, unsigned int upem,
     // Render
     {
       char output_path[255];
-      sprintf (output_path, "out/%d-%d.svg", face_index, i);
+      sprintf (output_path, "out/%u-%u.svg", face_index, i);
       cairo_surface_t *surface = cairo_svg_surface_create (output_path, extents.width, extents.height);
       cairo_t *cr = cairo_create (surface);
       cairo_set_font_face (cr, cairo_face);
@@ -345,3 +337,7 @@ main (int argc, char **argv)
 
   return 0;
 }
+
+#else
+int main (int argc, char **argv) { return 0; }
+#endif

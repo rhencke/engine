@@ -34,10 +34,6 @@
 /* Only picks up fonts that have a "Silf" table. */
 HB_SHAPER_IMPLEMENT (graphite2)
 #endif
-#ifdef HAVE_CORETEXT
-/* Only picks up fonts that have a "mort" or "morx" table. */
-HB_SHAPER_IMPLEMENT (coretext_aat)
-#endif
 
 HB_SHAPER_IMPLEMENT (ot) /* <--- This is our main OpenType shaper. */
 
@@ -51,6 +47,6 @@ HB_SHAPER_IMPLEMENT (directwrite)
 HB_SHAPER_IMPLEMENT (coretext)
 #endif
 
-#ifdef HAVE_FALLBACK
+#ifndef HB_NO_FALLBACK_SHAPE
 HB_SHAPER_IMPLEMENT (fallback) /* <--- This should be last. */
 #endif

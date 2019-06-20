@@ -4,6 +4,20 @@ HB_OT_H_IN
 </SECTION>
 
 <SECTION>
+<FILE>hb-aat-layout</FILE>
+HB_AAT_LAYOUT_NO_SELECTOR_INDEX
+hb_aat_layout_feature_type_t
+hb_aat_layout_feature_selector_t
+hb_aat_layout_feature_selector_info_t
+hb_aat_layout_feature_type_get_name_id
+hb_aat_layout_feature_type_get_selector_infos
+hb_aat_layout_get_feature_types
+hb_aat_layout_has_positioning
+hb_aat_layout_has_substitution
+hb_aat_layout_has_tracking
+</SECTION>
+
+<SECTION>
 <FILE>hb-blob</FILE>
 hb_blob_create
 hb_blob_create_from_file
@@ -110,11 +124,17 @@ hb_script_get_horizontal_direction
 hb_language_from_string
 hb_language_to_string
 hb_language_get_default
+hb_feature_from_string
+hb_feature_to_string
+hb_variation_from_string
+hb_variation_to_string
 hb_bool_t
 hb_codepoint_t
 hb_destroy_func_t
 hb_direction_t
 hb_language_t
+hb_feature_t
+hb_variation_t
 hb_mask_t
 hb_position_t
 hb_tag_t
@@ -133,6 +153,8 @@ HB_DIRECTION_IS_HORIZONTAL
 HB_DIRECTION_IS_VALID
 HB_DIRECTION_IS_VERTICAL
 HB_LANGUAGE_INVALID
+HB_FEATURE_GLOBAL_END
+HB_FEATURE_GLOBAL_START
 <SUBSECTION Private>
 HB_BEGIN_DECLS
 HB_END_DECLS
@@ -161,6 +183,10 @@ hb_ot_layout_table_choose_script
 hb_ot_layout_table_find_script
 hb_ot_tag_from_language
 hb_ot_tags_from_script
+HB_OT_VAR_NO_AXIS_INDEX
+hb_ot_var_axis_t
+hb_ot_var_find_axis
+hb_ot_var_get_axes
 hb_set_invert
 hb_unicode_eastasian_width_func_t
 hb_unicode_eastasian_width
@@ -169,12 +195,7 @@ HB_UNICODE_MAX_DECOMPOSITION_LEN
 hb_unicode_decompose_compatibility_func_t
 hb_unicode_decompose_compatibility
 hb_unicode_funcs_set_decompose_compatibility_func
-hb_font_funcs_set_glyph_h_kerning_func
 hb_font_funcs_set_glyph_v_kerning_func
-hb_font_get_glyph_h_kerning
-hb_font_get_glyph_h_kerning_func_t
-hb_font_get_glyph_kerning_for_direction
-hb_font_get_glyph_kerning_func_t
 hb_font_get_glyph_v_kerning
 hb_font_get_glyph_v_kerning_func_t
 </SECTION>
@@ -188,6 +209,14 @@ hb_coretext_face_create
 hb_coretext_font_create
 hb_coretext_face_get_cg_font
 hb_coretext_font_get_ct_font
+</SECTION>
+
+<SECTION>
+<FILE>hb-directwrite</FILE>
+hb_directwrite_face_create
+hb_directwrite_face_get_font_face
+<SUBSECTION Private>
+hb_directwrite_shape_experimental_width
 </SECTION>
 
 <SECTION>
@@ -237,6 +266,7 @@ hb_font_funcs_set_glyph_extents_func
 hb_font_funcs_set_glyph_from_name_func
 hb_font_funcs_set_glyph_h_advance_func
 hb_font_funcs_set_glyph_h_advances_func
+hb_font_funcs_set_glyph_h_kerning_func
 hb_font_funcs_set_glyph_h_origin_func
 hb_font_funcs_set_glyph_name_func
 hb_font_funcs_set_glyph_v_advance_func
@@ -266,8 +296,12 @@ hb_font_get_glyph_h_advance
 hb_font_get_glyph_h_advance_func_t
 hb_font_get_glyph_h_advances
 hb_font_get_glyph_h_advances_func_t
+hb_font_get_glyph_h_kerning
+hb_font_get_glyph_h_kerning_func_t
 hb_font_get_glyph_h_origin
 hb_font_get_glyph_h_origin_func_t
+hb_font_get_glyph_kerning_for_direction
+hb_font_get_glyph_kerning_func_t
 hb_font_get_glyph_name
 hb_font_get_glyph_name_func_t
 hb_font_get_glyph_origin_for_direction
@@ -303,9 +337,6 @@ hb_font_set_ppem
 hb_font_set_ptem
 hb_font_set_scale
 hb_font_set_user_data
-hb_variation_t
-hb_variation_from_string
-hb_variation_to_string
 hb_font_set_variations
 hb_font_set_var_coords_design
 hb_font_set_var_coords_normalized
@@ -581,12 +612,16 @@ HB_OT_TAG_VAR_AXIS_OPTICAL_SIZE
 HB_OT_TAG_VAR_AXIS_SLANT
 HB_OT_TAG_VAR_AXIS_WEIGHT
 HB_OT_TAG_VAR_AXIS_WIDTH
-HB_OT_VAR_NO_AXIS_INDEX
-hb_ot_var_axis_t
 hb_ot_var_has_data
-hb_ot_var_find_axis
+hb_ot_var_axis_flags_t
+hb_ot_var_axis_info_t
+hb_ot_var_find_axis_info
 hb_ot_var_get_axis_count
-hb_ot_var_get_axes
+hb_ot_var_get_axis_infos
+hb_ot_var_get_named_instance_count
+hb_ot_var_named_instance_get_subfamily_name_id
+hb_ot_var_named_instance_get_postscript_name_id
+hb_ot_var_named_instance_get_design_coords
 hb_ot_var_normalize_variations
 hb_ot_var_normalize_coords
 </SECTION>
@@ -627,11 +662,6 @@ hb_set_union
 
 <SECTION>
 <FILE>hb-shape</FILE>
-HB_FEATURE_GLOBAL_END
-HB_FEATURE_GLOBAL_START
-hb_feature_t
-hb_feature_from_string
-hb_feature_to_string
 hb_shape
 hb_shape_full
 hb_shape_list_shapers
@@ -693,8 +723,6 @@ hb_unicode_script_func_t
 <FILE>hb-uniscribe</FILE>
 hb_uniscribe_font_get_hfont
 hb_uniscribe_font_get_logfontw
-<SUBSECTION Private>
-hb_directwrite_shape_experimental_width
 </SECTION>
 
 <SECTION>
