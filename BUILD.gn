@@ -250,7 +250,7 @@ source_set("harfbuzz_sources") {
   ]
 }
 
-static_library("harfbuzz") {
+source_set("harfbuzz") {
   output_name = "harfbuzz"
   public_deps = [
     ":harfbuzz_sources"
