@@ -20,7 +20,8 @@ config("vulkan_headers_config") {
     defines = [ "VK_USE_PLATFORM_WIN32_KHR" ]
   }
   if (is_linux) {
-    defines = [ "VK_USE_PLATFORM_XCB_KHR" ]
+    # Linux-on-Fuchsia doesn't want XCB
+    #defines = [ "VK_USE_PLATFORM_XCB_KHR" ]
   }
   if (is_android) {
     defines = [ "VK_USE_PLATFORM_ANDROID_KHR" ]
