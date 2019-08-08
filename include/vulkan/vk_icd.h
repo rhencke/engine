@@ -88,6 +88,7 @@ typedef enum {
     VK_ICD_WSI_PLATFORM_ANDROID,
     VK_ICD_WSI_PLATFORM_MACOS,
     VK_ICD_WSI_PLATFORM_IOS,
+    VK_ICD_WSI_PLATFORM_FUCHSIA,
     VK_ICD_WSI_PLATFORM_DISPLAY,
     VK_ICD_WSI_PLATFORM_HEADLESS
 } VkIcdWsiPlatform;
@@ -156,6 +157,13 @@ typedef struct {
     const void *pView;
 } VkIcdSurfaceIOS;
 #endif  // VK_USE_PLATFORM_IOS_MVK
+
+#ifdef VK_USE_PLATFORM_FUCHSIA
+typedef struct {
+  VkIcdSurfaceBase base;
+} VkIcdSurfaceImagePipe;
+#endif // VK_USE_PLATFORM_FUCHSIA
+
 
 typedef struct {
     VkIcdSurfaceBase base;
