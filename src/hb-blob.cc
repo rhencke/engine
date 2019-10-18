@@ -48,7 +48,6 @@
 #endif /* HAVE_SYS_MMAN_H */
 
 #include <stdio.h>
-#include <errno.h>
 #include <stdlib.h>
 
 
@@ -487,6 +486,7 @@ hb_blob_t::try_make_writable ()
  * Mmap
  */
 
+#ifndef HB_NO_OPEN
 #ifdef HAVE_MMAP
 # include <sys/types.h>
 # include <sys/stat.h>
@@ -543,10 +543,6 @@ _hb_mapped_file_destroy (void *file_)
 hb_blob_t *
 hb_blob_create_from_file (const char *file_name)
 {
-#ifdef HB_NO_OPEN
-  return hb_blob_get_empty ();
-#endif
-
   /* Adopted from glib's gmappedfile.c with Matthias Clasen and
      Allison Lortie permission but changed a lot to suit our need. */
 #if defined(HAVE_MMAP) && !defined(HB_NO_MMAP)
@@ -595,7 +591,7 @@ fail_without_close:
     ceparams.lpSecurityAttributes = nullptr;
     ceparams.hTemplateFile = nullptr;
     fd = CreateFile2 (wchar_file_name, GENERIC_READ, FILE_SHARE_READ,
-                      OPEN_EXISTING, &ceparams);
+		      OPEN_EXISTING, &ceparams);
   }
 #else
   fd = CreateFileW (wchar_file_name, GENERIC_READ, FILE_SHARE_READ, nullptr,
@@ -672,7 +668,7 @@ fail_without_close:
   }
 
   return hb_blob_create (data, len, HB_MEMORY_MODE_WRITABLE, data,
-                         (hb_destroy_func_t) free);
+			 (hb_destroy_func_t) free);
 
 fread_fail:
   fclose (fp);
@@ -680,3 +676,4 @@ fread_fail_without_close:
   free (data);
   return hb_blob_get_empty ();
 }
+#endif /* !HB_NO_OPEN */
