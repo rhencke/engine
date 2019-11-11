@@ -69,6 +69,8 @@ source_set("rapidjson") {
     "include/rapidjson/istreamwrapper.h",
     "include/rapidjson/memorybuffer.h",
     "include/rapidjson/memorystream.h",
+    "include/rapidjson/msinttypes/inttypes.h",
+    "include/rapidjson/msinttypes/stdint.h",
     "include/rapidjson/ostreamwrapper.h",
     "include/rapidjson/pointer.h",
     "include/rapidjson/prettywriter.h",
