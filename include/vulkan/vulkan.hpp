@@ -15113,8 +15113,12 @@ namespace VULKAN_HPP_NAMESPACE
   using UniqueAccelerationStructureNV = UniqueHandle<AccelerationStructureNV, DispatchLoaderDefault>;
   template <typename Dispatch> class UniqueHandleTraits<Buffer, Dispatch> { public: using deleter = ObjectDestroy<Device, Dispatch>; };
   using UniqueBuffer = UniqueHandle<Buffer, DispatchLoaderDefault>;
+#ifdef VK_USE_PLATFORM_FUCHSIA
+
   template <typename Dispatch> class UniqueHandleTraits<BufferCollectionFUCHSIA, Dispatch> { public: using deleter = ObjectDestroy<Device, Dispatch>; };
   using UniqueBufferCollectionFUCHSIA = UniqueHandle<BufferCollectionFUCHSIA, DispatchLoaderDefault>;
+#endif /*VK_USE_PLATFORM_FUCHSIA*/
+
   template <typename Dispatch> class UniqueHandleTraits<BufferView, Dispatch> { public: using deleter = ObjectDestroy<Device, Dispatch>; };
   using UniqueBufferView = UniqueHandle<BufferView, DispatchLoaderDefault>;
   template <typename Dispatch> class UniqueHandleTraits<CommandBuffer, Dispatch> { public: using deleter = PoolFree<Device, CommandPool, Dispatch>; };
