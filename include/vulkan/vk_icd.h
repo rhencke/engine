@@ -90,7 +90,8 @@ typedef enum {
     VK_ICD_WSI_PLATFORM_IOS,
     VK_ICD_WSI_PLATFORM_FUCHSIA,
     VK_ICD_WSI_PLATFORM_DISPLAY,
-    VK_ICD_WSI_PLATFORM_HEADLESS
+    VK_ICD_WSI_PLATFORM_HEADLESS,
+    VK_ICD_WSI_PLATFORM_METAL,
 } VkIcdWsiPlatform;
 
 typedef struct {
@@ -179,5 +180,12 @@ typedef struct {
 typedef struct {
     VkIcdSurfaceBase base;
 } VkIcdSurfaceHeadless;
+
+#ifdef VK_USE_PLATFORM_METAL_EXT
+typedef struct {
+    VkIcdSurfaceBase base;
+    const CAMetalLayer *pLayer;
+} VkIcdSurfaceMetal;
+#endif // VK_USE_PLATFORM_METAL_EXT
 
 #endif  // VKICD_H

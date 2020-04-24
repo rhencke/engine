@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/vulkan_headers.gni")
+
 config("vulkan_headers_config") {
   include_dirs = [ "include" ]
 
@@ -23,11 +25,20 @@ config("vulkan_headers_config") {
     # Linux-on-Fuchsia doesn't want XCB
     #defines = [ "VK_USE_PLATFORM_XCB_KHR" ]
   }
+  if (defined(vulkan_use_x11) && vulkan_use_x11) {
+    defines = [ "VK_USE_PLATFORM_XCB_KHR" ]
+  }
   if (is_android) {
     defines = [ "VK_USE_PLATFORM_ANDROID_KHR" ]
   }
   if (is_fuchsia) {
     defines = [ "VK_USE_PLATFORM_FUCHSIA" ]
+  }
+  if (is_mac) {
+    defines = [ "VK_USE_PLATFORM_METAL_EXT" ]
+  }
+  if (defined(is_ggp) && is_ggp) {
+    defines = [ "VK_USE_PLATFORM_GGP" ]
   }
 }
 

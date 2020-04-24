@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-# Copyright (c) 2013-2019 The Khronos Group Inc.
+# Copyright (c) 2013-2020 The Khronos Group Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ from reg import Registry
 from validitygenerator import ValidityOutputGenerator
 from vkconventions import VulkanConventions
 
+
 # Simple timer functions
 startTime = None
 
@@ -40,6 +41,7 @@ def startTimer(timeit):
     global startTime
     if timeit:
         startTime = time.process_time()
+
 
 def endTimer(timeit, msg):
     global startTime
@@ -57,12 +59,13 @@ def makeREstring(strings, default=None, strings_are_regex=False):
         return '^(' + '|'.join(strings) + ')$'
     return default
 
-# Returns a directory of [ generator function, generator options ] indexed
-# by specified short names. The generator options incorporate the following
-# parameters:
-#
-# args is an parsed argument object; see below for the fields that are used.
+
 def makeGenOpts(args):
+    """Returns a directory of [ generator function, generator options ] indexed
+    by specified short names. The generator options incorporate the following
+    parameters:
+
+    args is an parsed argument object; see below for the fields that are used."""
     global genOpts
     genOpts = {}
 
@@ -100,7 +103,7 @@ def makeGenOpts(args):
     # Copyright text prefixing all headers (list of strings).
     prefixStrings = [
         '/*',
-        '** Copyright (c) 2015-2019 The Khronos Group Inc.',
+        '** Copyright (c) 2015-2020 The Khronos Group Inc.',
         '**',
         '** Licensed under the Apache License, Version 2.0 (the "License");',
         '** you may not use this file except in compliance with the License.',
@@ -242,9 +245,15 @@ def makeGenOpts(args):
     # Track all platform extensions, for exclusion from vulkan_core.h
     allPlatformExtensions = []
 
-    # Extensions suppressed for all platforms.
-    # Covers common WSI extension types.
+    # Extensions suppressed for all WSI platforms (WSI extensions required
+    # by all platforms)
     commonSuppressExtensions = [ 'VK_KHR_display', 'VK_KHR_swapchain' ]
+
+    # Extensions required and suppressed for beta "platform". This can
+    # probably eventually be derived from the requires= attributes of
+    # the extension blocks.
+    betaRequireExtensions = [ 'VK_KHR_ray_tracing', 'VK_KHR_deferred_host_operations', 'VK_KHR_pipeline_library' ]
+    betaSuppressExtensions = [ 'VK_NV_ray_tracing' ]
 
     platforms = [
         [ 'vulkan_android.h',     [ 'VK_KHR_android_surface',
@@ -270,6 +279,7 @@ def makeGenOpts(args):
         [ 'vulkan_xlib.h',        [ 'VK_KHR_xlib_surface'         ], commonSuppressExtensions ],
         [ 'vulkan_xlib_xrandr.h', [ 'VK_EXT_acquire_xlib_display' ], commonSuppressExtensions ],
         [ 'vulkan_metal.h',       [ 'VK_EXT_metal_surface'        ], commonSuppressExtensions ],
+        [ 'vulkan_beta.h',        betaRequireExtensions,             betaSuppressExtensions ],
     ]
 
     for platform in platforms:
@@ -403,16 +413,18 @@ def makeGenOpts(args):
             alignFuncParam    = 36)
         ]
 
-# Generate a target based on the options in the matching genOpts{} object.
-# This is encapsulated in a function so it can be profiled and/or timed.
-# The args parameter is an parsed argument object containing the following
-# fields that are used:
-#   target - target to generate
-#   directory - directory to generate it in
-#   protect - True if re-inclusion wrappers should be created
-#   extensions - list of additional extensions to include in generated
-#   interfaces
+
 def genTarget(args):
+    """Generate a target based on the options in the matching genOpts{} object.
+
+    This is encapsulated in a function so it can be profiled and/or timed.
+    The args parameter is an parsed argument object containing the following
+    fields that are used:
+
+    - target - target to generate
+    - directory - directory to generate it in
+    - protect - True if re-inclusion wrappers should be created
+    - extensions - list of additional extensions to include in generated interfaces"""
     # Create generator options with specified parameters
     makeGenOpts(args)
 
@@ -522,7 +534,7 @@ if __name__ == '__main__':
 
     if args.dump:
         write('* Dumping registry to regdump.txt', file=sys.stderr)
-        reg.dumpReg(filehandle = open('regdump.txt', 'w', encoding='utf-8'))
+        reg.dumpReg(filehandle=open('regdump.txt', 'w', encoding='utf-8'))
 
     # create error/warning & diagnostic files
     if args.errfile:
