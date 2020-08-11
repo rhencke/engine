@@ -134,13 +134,13 @@ struct hb_ot_map_t
   unsigned int get_feature_stage (unsigned int table_index, hb_tag_t feature_tag) const
   {
     const feature_map_t *map = features.bsearch (feature_tag);
-    return map ? map->stage[table_index] : (unsigned int) -1;
+    return map ? map->stage[table_index] : UINT_MAX;
   }
 
   void get_stage_lookups (unsigned int table_index, unsigned int stage,
 			  const struct lookup_map_t **plookups, unsigned int *lookup_count) const
   {
-    if (unlikely (stage == (unsigned int) -1)) {
+    if (unlikely (stage == UINT_MAX)) {
       *plookups = nullptr;
       *lookup_count = 0;
       return;
@@ -213,8 +213,8 @@ struct hb_ot_map_builder_t
   { add_feature (feat.tag, feat.flags); }
 
   void enable_feature (hb_tag_t tag,
-			      hb_ot_map_feature_flags_t flags=F_NONE,
-			      unsigned int value=1)
+		       hb_ot_map_feature_flags_t flags=F_NONE,
+		       unsigned int value=1)
   { add_feature (tag, F_GLOBAL | flags, value); }
 
   void disable_feature (hb_tag_t tag)
