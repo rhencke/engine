@@ -260,34 +260,34 @@ source_set("harfbuzz_sources") {
     defines += [ "HAVE_CORETEXT" ]
   }
 
+  if (is_linux || is_android || is_fuchsia) {
+    defines += [ "HAVE_PTHREAD" ]
+  }
+
   configs += [ ":harfbuzz_warnings" ]
 
   # Without this modification, almost everything ends up hidden in the shared library, making it
   # useless for linking.
   if (current_toolchain == shlib_toolchain) {
     # Avoid failure when subtracting if not already present.
-    configs += ["//build/config:symbol_visibility_hidden"]
-    configs -= ["//build/config:symbol_visibility_hidden"]
+    configs += [ "//build/config:symbol_visibility_hidden" ]
+    configs -= [ "//build/config:symbol_visibility_hidden" ]
   }
 
   public_configs = [ ":harfbuzz_config" ]
 
   deps = [
+    "//third_party/freetype2",
     "//third_party/icu:icuuc",
-    "//third_party/freetype2"
   ]
 }
 
 source_set("harfbuzz") {
   output_name = "harfbuzz"
-  public_deps = [
-    ":harfbuzz_sources"
-  ]
+  public_deps = [ ":harfbuzz_sources" ]
 }
 
 shared_library("harfbuzz_shared") {
   output_name = "harfbuzz"
-  public_deps = [
-    ":harfbuzz_sources",
-  ]
+  public_deps = [ ":harfbuzz_sources" ]
 }
