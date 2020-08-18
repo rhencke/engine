@@ -154,6 +154,7 @@ source_set("harfbuzz_sources") {
     "src/hb-ot-post-macroman.hh",
     "src/hb-ot-post-table.hh",
     "src/hb-ot-shape-complex-arabic-fallback.hh",
+    "src/hb-ot-shape-complex-arabic-joining-list.hh",
     "src/hb-ot-shape-complex-arabic-table.hh",
     "src/hb-ot-shape-complex-arabic-win1256.hh",
     "src/hb-ot-shape-complex-arabic.cc",
