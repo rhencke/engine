@@ -1,0 +1,9 @@
+Name: freetype2
+URL: https://www.freetype.org/
+License: FTL
+License File: docs/FTL.TXT
+Upstream Git: https://git.savannah.gnu.org/git/freetype/freetype2.git
+Description:
+
+FreeType is a freely available software library to render fonts.
+
