@@ -1,0 +1,30 @@
+Name: libjpeg-turbo
+Upstream git: https://github.com/libjpeg-turbo/libjpeg-turbo/
+Version: 1.5.0
+License: Custom license
+License File: LICENSE.md
+Security Critical: yes
+License Android Compatible: yes
+Description:
+
+This consists of the components:
+* libjpeg-turbo 1.5.0
+* This file (README.fuchsia)
+* A build file (BUILD.gn)
+* Deleted unused directories: cmakescripts, doc, java, md5, release, sharedlib,
+  testimages, and win
+* Patched header files used by Chromium
+
+We applied the following changes which are not merged to upstream:
+
+* Added the 'private_extern' flags on Mac (or the 'hidden' flags on Linux) to
+  all the global symbols in '.asm' files to prevent making them external ones.
+  http://crbug.com/608347
+* Fix libjpeg_turbo svn r64 libjpeg6b compat issue: make the fast path Huffman
+  decoder fallback to slow decoding if the Huffman decoding bit sentinel > 16,
+  this to match the exact behavior of jpeg_huff_decode().
+  http://crbug.com/398235
+* Fixed an issue with the ARM NEON build.
+  http://crbug.com/451035
+* Configuration files jconfig.h and jconfigint.h
+  http://crbug.com/608347
