@@ -1,0 +1,34 @@
+name: nnbd_migration
+
+# This package is not intended for consumption on pub.dev. DO NOT publish.
+publish_to: none
+
+environment:
+  sdk: '>=2.6.0 <3.0.0'
+
+dependencies:
+  _fe_analyzer_shared:
+    path: ../_fe_analyzer_shared
+  analyzer:
+    path: ../analyzer
+  analyzer_plugin:
+    path: ../analyzer_plugin
+  args: ^1.4.4
+  charcode: ^1.1.0
+  cli_util: ^0.2.0
+  collection: ^1.14.11
+  crypto: ^2.0.6
+  meta:
+    path: ../meta
+  path: ^1.6.2
+  pub_semver: ^1.4.2
+  source_span: ^1.4.1
+  yaml: any
+
+dev_dependencies:
+  analyzer_utilities:
+    path: ../analyzer_utilities
+  http: '>=0.11.3+17 <0.13.0'
+  pedantic: ^1.9.0
+  test: ^1.6.4
+  test_reflective_loader: ^0.1.8

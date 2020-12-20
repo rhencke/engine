@@ -1,0 +1,54 @@
+library /*isNonNullableByDefault*/;
+import self as self;
+import "dart:core" as core;
+import "mixin_from_opt_out_lib.dart" as mix;
+
+import "org-dartlang-testcase:///mixin_from_opt_out_lib.dart";
+
+abstract class _Class&Object&Mixin extends core::Object implements mix::Mixin /*isAnonymousMixin,isEliminatedMixin,hasConstConstructor*/  {
+  const synthetic constructor •() → self::_Class&Object&Mixin
+    : super core::Object::•()
+    ;
+  abstract member-signature operator /*isLegacy, from org-dartlang-testcase:///mixin_from_opt_out_lib.dart */ ==(dynamic other) → core::bool*; -> core::Object::==
+  method /*isLegacy, from org-dartlang-testcase:///mixin_from_opt_out_lib.dart */ method(core::int* i) → core::int*
+    return let final core::int* #t1 = i in #t1.{core::num::==}(null) ?{core::int*} 0 : #t1;
+  abstract member-signature get /*isLegacy, from org-dartlang-testcase:///mixin_from_opt_out_lib.dart */ _identityHashCode() → core::int*; -> core::Object::_identityHashCode
+  abstract member-signature method /*isLegacy, from org-dartlang-testcase:///mixin_from_opt_out_lib.dart */ _instanceOf(dynamic instantiatorTypeArguments, dynamic functionTypeArguments, dynamic type) → core::bool*; -> core::Object::_instanceOf
+  abstract member-signature method /*isLegacy, from org-dartlang-testcase:///mixin_from_opt_out_lib.dart */ _simpleInstanceOf(dynamic type) → core::bool*; -> core::Object::_simpleInstanceOf
+  abstract member-signature method /*isLegacy, from org-dartlang-testcase:///mixin_from_opt_out_lib.dart */ _simpleInstanceOfTrue(dynamic type) → core::bool*; -> core::Object::_simpleInstanceOfTrue
+  abstract member-signature method /*isLegacy, from org-dartlang-testcase:///mixin_from_opt_out_lib.dart */ _simpleInstanceOfFalse(dynamic type) → core::bool*; -> core::Object::_simpleInstanceOfFalse
+  abstract member-signature get /*isLegacy, from org-dartlang-testcase:///mixin_from_opt_out_lib.dart */ hashCode() → core::int*; -> core::Object::hashCode
+  abstract member-signature method /*isLegacy, from org-dartlang-testcase:///mixin_from_opt_out_lib.dart */ toString() → core::String*; -> core::Object::toString
+  abstract member-signature method /*isLegacy, from org-dartlang-testcase:///mixin_from_opt_out_lib.dart */ noSuchMethod(core::Invocation* invocation) → dynamic; -> core::Object::noSuchMethod
+  abstract member-signature get /*isLegacy, from org-dartlang-testcase:///mixin_from_opt_out_lib.dart */ runtimeType() → core::Type*; -> core::Object::runtimeType
+}
+class Class extends self::_Class&Object&Mixin {
+  synthetic constructor •() → self::Class
+    : super self::_Class&Object&Mixin::•()
+    ;
+}
+static method main() → dynamic {
+  core::print(new self::Class::•().{mix::Mixin::method}(null));
+}
+
+library;
+import self as mix;
+import "dart:core" as core;
+
+class Mixin extends core::Object {
+  synthetic constructor •() → mix::Mixin*
+    : super core::Object::•()
+    ;
+  method method(core::int* i) → core::int*
+    return let final core::int* #t2 = i in #t2.{core::num::==}(null) ?{core::int*} 0 : #t2;
+  abstract member-signature get _identityHashCode() → core::int*; -> core::Object::_identityHashCode
+  abstract member-signature method _instanceOf(dynamic instantiatorTypeArguments, dynamic functionTypeArguments, dynamic type) → core::bool*; -> core::Object::_instanceOf
+  abstract member-signature method _simpleInstanceOf(dynamic type) → core::bool*; -> core::Object::_simpleInstanceOf
+  abstract member-signature method _simpleInstanceOfTrue(dynamic type) → core::bool*; -> core::Object::_simpleInstanceOfTrue
+  abstract member-signature method _simpleInstanceOfFalse(dynamic type) → core::bool*; -> core::Object::_simpleInstanceOfFalse
+  abstract member-signature operator ==(dynamic other) → core::bool*; -> core::Object::==
+  abstract member-signature get hashCode() → core::int*; -> core::Object::hashCode
+  abstract member-signature method toString() → core::String*; -> core::Object::toString
+  abstract member-signature method noSuchMethod(core::Invocation* invocation) → dynamic; -> core::Object::noSuchMethod
+  abstract member-signature get runtimeType() → core::Type*; -> core::Object::runtimeType
+}
