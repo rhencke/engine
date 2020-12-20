@@ -1,0 +1,124 @@
+# Copyright 2014 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/android/config.gni")
+import("//build/config/sanitizers/sanitizers.gni")
+import("BUILD.generated.gni")
+
+# Config for us and everybody else depending on BoringSSL.
+config("external_config") {
+  include_dirs = [ "src/include" ]
+  if (is_component_build) {
+    defines = [ "BORINGSSL_SHARED_LIBRARY" ]
+  }
+}
+
+# Config internal to this build file, shared by boringssl and boringssl_fuzzer.
+config("internal_config") {
+  visibility = [ ":*" ]  # Only targets in this file can depend on this.
+  defines = [
+    "BORINGSSL_ALLOW_CXX_RUNTIME",
+    "BORINGSSL_IMPLEMENTATION",
+    "BORINGSSL_NO_STATIC_INITIALIZER",
+    "OPENSSL_SMALL",
+  ]
+  if (is_posix) {
+    # We are only interested in exposing the exported symbols (for size reasons).
+    cflags = [ "-fvisibility=hidden" ]
+    cflags_c = [ "-std=c11" ]
+    cflags_cc = [ "-std=c++14" ]
+    defines += [ "_XOPEN_SOURCE=700" ]
+  }
+}
+
+config("no_asm_config") {
+  visibility = [ ":*" ]  # Only targets in this file can depend on this.
+  defines = [ "OPENSSL_NO_ASM" ]
+}
+
+# This has no sources on some platforms so must be a source_set.
+source_set("boringssl_asm") {
+  visibility = [ ":*" ]  # Only targets in this file can depend on this.
+
+  defines = []
+  sources = []
+  include_dirs = [ "src/include" ]
+  asmflags = []
+
+  if ((current_cpu == "arm" || current_cpu == "arm64") && is_android && is_clang) {
+    # Disable the integrated assembler and use the one shipped with the NDK.
+    import("//build/config/android/config.gni")
+    rebased_android_toolchain_root =
+        rebase_path(android_toolchain_root, root_build_dir)
+    asmflags += [
+      "-fno-integrated-as",
+      "-B${rebased_android_toolchain_root}/bin",
+    ]
+    if (current_cpu == "arm64") {
+      asmflags += ["-Wa,-march=armv8-a+crypto"]
+    }
+  }
+
+  if (is_msan) {
+    public_configs = [ ":no_asm_config" ]
+  } else if (current_cpu == "x64") {
+    if (is_mac) {
+      sources += crypto_sources_mac_x86_64
+    } else if (is_linux || is_android) {
+      sources += crypto_sources_linux_x86_64
+    } else {
+      public_configs = [ ":no_asm_config" ]
+    }
+  } else if (current_cpu == "x86") {
+    if (is_mac) {
+      sources += crypto_sources_mac_x86
+    } else if (is_linux || is_android) {
+      sources += crypto_sources_linux_x86
+    } else {
+      public_configs = [ ":no_asm_config" ]
+    }
+  } else if (current_cpu == "arm" && (is_linux || is_android)) {
+    sources += crypto_sources_linux_arm
+  } else if (current_cpu == "arm64" && (is_linux || is_android)) {
+    sources += crypto_sources_linux_aarch64
+    asmflags += [ "-march=armv8-a+crypto" ]
+  } else {
+    public_configs = [ ":no_asm_config" ]
+  }
+}
+
+source_set("crypto") {
+  sources = crypto_sources
+  public_configs = [ ":external_config" ]
+  configs += [ ":internal_config" ]
+
+  if (is_win) {
+    configs += [ ":no_asm_config" ]
+  } else {
+    deps = [
+      ":boringssl_asm",
+    ]
+  }
+
+  configs -= [ "//build/config/compiler:chromium_code" ]
+  configs += [ "//build/config/compiler:no_chromium_code" ]
+}
+
+source_set("ssl") {
+  sources = ssl_sources
+  deps = [ ":crypto" ]
+  configs += [ ":internal_config" ]
+
+  configs -= [ "//build/config/compiler:chromium_code" ]
+  configs += [ "//build/config/compiler:no_chromium_code" ]
+}
+
+component("boringssl") {
+  public_deps = [
+    ":crypto",
+    ":ssl"
+  ]
+
+  public_configs = [ ":external_config" ]
+}
