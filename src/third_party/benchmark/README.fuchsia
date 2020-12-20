@@ -1,0 +1,7 @@
+Name: benchmark
+License: Apache 2.0
+License File: LICENSE
+Upstream Git: https://github.com/google/benchmark
+Description:
+
+A library to support the benchmarking of functions, similar to unit-tests.

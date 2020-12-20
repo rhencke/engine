@@ -1,0 +1,32 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config("benchmark_config") {
+  visibility = [ ":*" ]
+  include_dirs = [ "include" ]
+}
+
+static_library("benchmark") {
+  testonly = true
+  sources = [
+    "src/benchmark.cc",
+    "src/benchmark_register.cc",
+    "src/colorprint.cc",
+    "src/commandlineflags.cc",
+    "src/complexity.cc",
+    "src/console_reporter.cc",
+    "src/csv_reporter.cc",
+    "src/json_reporter.cc",
+    "src/reporter.cc",
+    "src/sleep.cc",
+    "src/string_util.cc",
+    "src/sysinfo.cc",
+    "src/timers.cc",
+  ]
+  public_configs = [ ":benchmark_config" ]
+  defines = [
+    "HAVE_POSIX_REGEX",
+    "HAVE_THREAD_SAFETY_ATTRIBUTES",
+  ]
+}
