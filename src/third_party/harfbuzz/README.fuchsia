@@ -1,0 +1,19 @@
+Name: harfbuzz
+Short Name: harfbuzz
+URL: http://harfbuzz.org
+Version: 2.7.1
+Upstream git: https://github.com/harfbuzz/harfbuzz
+Date: 20200818
+Security Critical: yes
+License: MIT
+License File: COPYING
+
+Description:
+This is harfbuzz, a text shaping engine.
+
+To upgrade this repo:
+* Pull in the latest updates from https://github.com/harfbuzz/harfbuzz.
+  If merging is not possible, remove all files except for BUILD.gn and
+  README.fuchsia and replace them with the upstream version.
+* Modify the BUILD.gn file to update the harfbuzz target for new sources.
+* Update version numbers and date in this document.
